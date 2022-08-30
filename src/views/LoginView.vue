@@ -26,13 +26,15 @@
 </template>
 
 <script>
+	import $http from "../axios/login.js";
+	import {NAMES} from "@/store"
 	export default {
 		name: "Login",
 		data() {
 			return {
 				form: {
-					account: "",
-					password: "",
+					account: "admin",
+					password: "123456",
 				},
 				isLoading: false,
 				rules: {
@@ -60,8 +62,8 @@
 						const { data } = await $http.login(this.form);
 						if (data.code == 200) {
 							// this.$store.commit("set_token", data)
-							// this[NAMES.set_token](data);
-							// this.$router.replace("/home");
+							this[NAMES.set_token](data);
+							this.$router.replace("/home");
 						}
 					}
 				})
