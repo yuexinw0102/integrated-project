@@ -8,11 +8,11 @@
 				<template slot#header>
 					<h1>生鲜电商-后台系统</h1>
 				</template>
-				<el-form :model="form">
-					<el-form-item>
+				<el-form :model="form" :rules="rules" ref="loginForm">
+					<el-form-item prop="account">
 						<el-input v-model="form.account" placeholder="账号" />
 					</el-form-item>
-					<el-form-item>
+					<el-form-item prop="password">
 						<el-input type="password" v-model="form.password" placeholder="密码" />
 					</el-form-item>
 					<el-form-item>
@@ -35,6 +35,16 @@
 					password: "",
 				},
 				isLoading: false,
+				rules: {
+					account: [
+						{ required: true, message: '请输入账户', trigger: 'blur' },
+						{ min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' }
+					],
+					password: [
+						{ required: true, message: '请输入密码', trigger: 'blur' },
+						{ min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' }
+					],
+				}
 			};
 		},
 		methods: {
@@ -44,9 +54,18 @@
 				setTimeout(() => {
 					this.isLoading = false;
 				}, 2000);
-				this.$router.replace({
-					path: "/home",
-				});
+				this.$refs["loginForm"].validate(async (valid) => {
+					console.log("handler_login valid", valid);
+					if (valid) {
+						const { data } = await $http.login(this.form);
+						if (data.code == 200) {
+							// this.$store.commit("set_token", data)
+							// this[NAMES.set_token](data);
+							// this.$router.replace("/home");
+						}
+					}
+				})
+				// this.$router.replace("/home");
 			},
 		},
 	};
