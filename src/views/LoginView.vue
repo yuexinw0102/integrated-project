@@ -61,8 +61,8 @@
 					if (valid) {
 						const { data } = await $http.login(this.form);
 						if (data.code == 200) {
-							// this.$store.commit("set_token", data)
-							this[NAMES.set_token](data);
+							this.$store.commit("set_token", data)
+							// this[NAMES.set_token](data);
 							this.$router.replace("/home");
 						}
 					}

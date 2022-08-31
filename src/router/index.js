@@ -1,36 +1,44 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from "vue";
+import VueRouter from "vue-router";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    redirect:"/login"
+    path: "/",
+    redirect: "/login",
   },
   {
-    path: '/login',
-    name: 'login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue')
+    path: "/login",
+    name: "login",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/LoginView.vue"),
   },
   {
-    path: '/home',
-    name: 'home',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/HomeView.vue')
+    path: "/home",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/HomeView.vue"),
+    children: [
+      {
+        path: "/welcome",
+        name: "welcome", // 上面的name应该写在这里
+        component: () =>
+          import(/* webpackChunkName: "welcome" */ "../views/WelcomeView.vue"),
+      },
+      {
+        path: "/user",
+        name: "user",
+        component: () =>
+          import(/* webpackChunkName: "about" */ "../views/user/UserView.vue"),
+      },
+    ],
   },
-  
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
