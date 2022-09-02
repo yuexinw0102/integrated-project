@@ -1,6 +1,6 @@
 <template>
     <div>
-        用户管理
+        分类列表
     </div>
 </template>
 

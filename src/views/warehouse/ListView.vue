@@ -1,6 +1,6 @@
 <template>
     <div>
-        用户管理
+        仓库管理
     </div>
 </template>
 

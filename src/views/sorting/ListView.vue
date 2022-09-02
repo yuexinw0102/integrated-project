@@ -1,6 +1,6 @@
 <template>
     <div>
-        用户管理
+        分拣监控
     </div>
 </template>
 

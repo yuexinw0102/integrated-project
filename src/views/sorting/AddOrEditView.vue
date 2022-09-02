@@ -1,12 +1,12 @@
 <template>
     <div>
-        用户管理
+        缺勤记录添加或编辑
     </div>
 </template>
 
 <script>
     export default {
-        name: "AbsencesList",
+        name: "AbsencesAddOrEdit",
         data() {
             return {
                 

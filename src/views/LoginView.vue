@@ -27,7 +27,8 @@
 
 <script>
 	import $http from "../axios/login.js";
-	import {NAMES} from "@/store"
+	import { mapMutations } from "vuex";
+	import { NAMES } from "@/store";
 	export default {
 		name: "Login",
 		data() {
@@ -57,18 +58,18 @@
 					this.isLoading = false;
 				}, 2000);
 				this.$refs["loginForm"].validate(async (valid) => {
-					console.log("handler_login valid", valid);
 					if (valid) {
 						const { data } = await $http.login(this.form);
 						if (data.code == 200) {
-							this.$store.commit("set_token", data)
-							// this[NAMES.set_token](data);
+							// this.$store.commit("set_token", data)
+							this[NAMES.set_token](data);
 							this.$router.replace("/home");
 						}
 					}
 				})
 				// this.$router.replace("/home");
 			},
+			...mapMutations([NAMES.set_token]),
 		},
 	};
 </script>
