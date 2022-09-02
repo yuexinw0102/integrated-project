@@ -1,7 +1,10 @@
-import Vue from 'vue';
-import 'element-ui/lib/theme-chalk/index.css';
-import 'element-ui/lib/theme-chalk/display.css';
+import Vue from "vue";
+import "element-ui/lib/theme-chalk/index.css";
+import "element-ui/lib/theme-chalk/display.css";
 import {
+  Descriptions,
+  DescriptionsItem,
+  Avatar,
   Pagination,
   Dialog,
   Autocomplete,
@@ -78,10 +81,13 @@ import {
   Loading,
   MessageBox,
   Message,
-  Notification
-} from 'element-ui';
+  Notification,
+} from "element-ui";
 
 Vue.use(Pagination);
+Vue.use(Avatar);
+Vue.use(Descriptions);
+Vue.use(DescriptionsItem);
 Vue.use(Dialog);
 Vue.use(Autocomplete);
 Vue.use(Dropdown);

@@ -52,7 +52,6 @@
 		},
 		methods: {
 			handler_login() {
-				console.log("登录");
 				this.isLoading = true;
 				setTimeout(() => {
 					this.isLoading = false;

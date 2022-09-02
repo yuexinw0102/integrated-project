@@ -1,6 +1,8 @@
 <template>
     <el-container id="root">
-        <el-header>Header</el-header>
+        <el-header style="padding: 0;">
+            <MyHeader></MyHeader>
+        </el-header>
         <el-container>
             <el-aside width="200px">
                 <MyMenus></MyMenus>
@@ -14,11 +16,13 @@
 
 <script>
     import MyMenus from "@/components/MyMenus.vue";
+    import MyHeader from "@/components/MyHeader.vue";
 
     export default {
         name: "HomeView",
         components: {
             MyMenus,
+            MyHeader
         },
     }
 
