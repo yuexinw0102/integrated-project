@@ -8,7 +8,7 @@
             <el-dropdown @command="handel_command">
                 <el-avatar icon="el-icon-user-solid" style=" overflow:unset;"></el-avatar>
                 <el-dropdown-menu>
-                    <el-dropdown-item command="/userinfo">个人信息</el-dropdown-item>
+                    <el-dropdown-item >个人信息</el-dropdown-item>
                     <el-dropdown-item command="logout" divided>注销</el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>
@@ -26,7 +26,7 @@
         },
         methods: {
             handel_command(command){
-                this.$router.replace(command);  
+                
             }
         }
     }
