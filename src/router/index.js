@@ -114,18 +114,19 @@ router.beforeEach((to, from, next) => {
   // console.log("router.beforeEach", to, from);
   // 一旦使用了全局守卫就要考虑白名单
   // 处理白名单
-  const whileList = ["/login"];
-  if (whileList.indexOf(to.path) != -1) {
+  if (to.path === "/login") {
     next();
   } else {
     const store = JSON.parse(sessionStorage.getItem("vuex"));
     console.log(store);
-    if (store) {
-      next();
+    if (store === null || store === "" || store === undefined) {
+      setTimeout(function () {
+        next("/");
+      }, 1000);
     } else {
-      next("/");
+      next();
     }
-  } 
+  }
 
   // next();
 });
