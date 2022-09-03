@@ -111,9 +111,6 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // console.log("router.beforeEach", to, from);
-  // 一旦使用了全局守卫就要考虑白名单
-  // 处理白名单
   if (to.path === "/login") {
     next();
   } else {

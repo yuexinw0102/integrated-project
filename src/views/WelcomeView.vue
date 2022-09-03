@@ -1,20 +1,18 @@
 <template>
     <div>
-        欢迎页面
+        <Keyboard></Keyboard>
     </div>
 </template>
 
 <script>
+    import Keyboard from '@/components/Keyboard.vue';
     export default {
         name: "Welcome",
         data() {
-            return {
-                
-            }
+            return {};
         },
-        methods: {
-            
-        },
+        methods: {},
+        components: { Keyboard}
     }
 </script>
 
