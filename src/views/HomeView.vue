@@ -20,6 +20,11 @@
 
     export default {
         name: "HomeView",
+        data() {
+            return {
+                loginUser: JSON.parse(sessionStorage.getItem("vuex")),
+            }
+        },
         components: {
             MyMenus,
             MyHeader

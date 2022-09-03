@@ -16,7 +16,7 @@ const routes = [
   },
   {
     path: "/home",
-    redirect:"/welcome",
+    redirect: "/welcome",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/HomeView.vue"),
     children: [
@@ -36,13 +36,17 @@ const routes = [
         path: "/product_list",
         name: "product",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/goods/product/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/goods/product/ListView.vue"
+          ),
       },
       {
         path: "/classify_list",
         name: "classify",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/goods/classify/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/goods/classify/ListView.vue"
+          ),
       },
       {
         path: "/order_list",
@@ -54,46 +58,76 @@ const routes = [
         path: "/warehouse",
         name: "warehouse",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/warehouse/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/warehouse/ListView.vue"
+          ),
       },
       {
         path: "/sorting",
         name: "sorting",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/sorting/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/sorting/ListView.vue"
+          ),
       },
       {
         path: "/distribution",
         name: "distribution",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/distribution/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/distribution/ListView.vue"
+          ),
       },
       {
         path: "/role",
         name: "role",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/limits/role/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/limits/role/ListView.vue"
+          ),
       },
       {
         path: "/department",
         name: "department",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/limits/department/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/limits/department/ListView.vue"
+          ),
       },
       {
         path: "/account",
         name: "account",
         component: () =>
-          import(/* webpackChunkName: "about" */ "../views/limits/account/ListView.vue"),
+          import(
+            /* webpackChunkName: "about" */ "../views/limits/account/ListView.vue"
+          ),
       },
     ],
   },
 ];
 
 const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  // console.log("router.beforeEach", to, from);
+  // 一旦使用了全局守卫就要考虑白名单
+  // 处理白名单
+  const whileList = ["/login"];
+  if (whileList.indexOf(to.path) != -1) {
+    next();
+  } else {
+    const store = JSON.parse(sessionStorage.getItem("vuex"));
+    console.log(store);
+    if (store) {
+      next();
+    } else {
+      next("/");
+    }
+  } 
+
+  // next();
 });
 
 export default router;

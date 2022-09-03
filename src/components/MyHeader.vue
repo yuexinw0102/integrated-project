@@ -26,7 +26,8 @@
         },
         methods: {
             handel_command(command){
-                
+                sessionStorage.removeItem("vuex");
+                this.$router.replace("/login");
             }
         }
     }
