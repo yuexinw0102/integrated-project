@@ -22,7 +22,7 @@
         name: "HomeView",
         data() {
             return {
-                loginUser: JSON.parse(sessionStorage.getItem("vuex")),
+                loginUser: JSON.parse(sessionStorage.getItem("token")),
             }
         },
         components: {

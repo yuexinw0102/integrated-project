@@ -114,7 +114,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === "/login") {
     next();
   } else {
-    const store = JSON.parse(sessionStorage.getItem("vuex"));
+    const store = JSON.parse(sessionStorage.getItem("token"));
     console.log(store);
     if (store === null || store === "" || store === undefined) {
       setTimeout(function () {
