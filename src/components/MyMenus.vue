@@ -2,7 +2,7 @@
   <el-col style="height: 100%;">
     <el-menu default-active="/welcome" class="el-menu-vertical-demo"
       background-color="#545c64" text-color="#fff" active-text-color="#ffd04b"
-      style="height: 100%;" router="true">
+      style="height: 100%;" router>
       <el-menu-item index="/welcome">
         <i class="el-icon-s-grid"></i>
         <span slot="title">首页</span>
