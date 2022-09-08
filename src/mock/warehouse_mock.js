@@ -3,7 +3,7 @@ const Mock = require("mockjs");
 const Random = Mock.Random;
 Mock.mock("/warehouse", (req, res) => {
   let list = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 200; i++) {
     let listObject = {
       name : Random.cname(),
       city :Random.city(),
@@ -14,5 +14,6 @@ Mock.mock("/warehouse", (req, res) => {
   }
   return {
     data: list,
+    count:list.length
   };
 });

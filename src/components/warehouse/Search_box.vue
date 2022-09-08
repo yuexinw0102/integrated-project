@@ -8,20 +8,18 @@
 </template>
 
 <script>
-    import { mapMutations } from "vuex";
-    import { NAMES } from "@/store";
     export default {
+        props: ['get_data'],
         data() {
             return {
-                data:"",
-                input:""
+                data: this.get_data,
+                input: ""
             }
         },
-        created() {
-            this.data=this[NAMES.wa_city]
+        mounted() {
+            console.log(this.data);
         },
         methods: {
-            ...mapMutations([NAMES.wa_city]),
         },
     }
 </script>

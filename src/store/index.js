@@ -7,14 +7,11 @@ Vue.use(Vuex)
 export const NAMES = {
   set_token: "set_token",
   token: "token",
-  set_city:"set_city",
-  wa_city:'wa_city',
 }
 
 export default new Vuex.Store({
   state: {
     token: "",
-    wa_city:[],
   },
   getters: {
   },
@@ -22,10 +19,6 @@ export default new Vuex.Store({
     [NAMES.set_token](state, payload) {
       state.token = payload.token_header + payload.token;
     },
-    [NAMES.set_city](state, payload) {
-      state.wa_city = payload
-    },
-    
   },
   actions: {
   },
@@ -42,5 +35,4 @@ export default new Vuex.Store({
       }
     })
   ]
-
 })
