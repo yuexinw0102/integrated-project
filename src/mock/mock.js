@@ -6,7 +6,7 @@ const goodsTitles = ['港供基地上海青苗', '水果玉米', '贝贝南瓜',
 Mock.mock('/product_list', (req, res) => {
   let list = [];
   let datas = Mock.mock({
-    "GoodsInfo|10": [{
+    "GoodsInfo|100": [{
       'id|+1': 20220001,
       'title|1': goodsTitles,
       'variety|1': goodsTitles,
@@ -16,7 +16,8 @@ Mock.mock('/product_list', (req, res) => {
       "isRecommend|1": ['是', '否'],
       'originalPrice|10-12.2': 0,
       'nowPrice|6-8.2': 0,
-      'state|1': ['已上架', '待上架', '已下架'],
+      // 'state|1': ['已上架', '待上架', '已下架'],
+      'state|1': ['已上架'],
     }]
   })
   list.push(datas)

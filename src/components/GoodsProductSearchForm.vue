@@ -1,7 +1,11 @@
 <template>
-  <el-card shadow="never">
-    <el-form ref="goodsSearchForm" :model="goodsSearchForm">
-      <el-row :gutter="20" class="demo-autocomplete">
+  <el-card class="goodsSearchCard" shadow="never">
+    <el-form
+      ref="goodsSearchForm"
+      :model="goodsSearchForm"
+      class="goodsSearchForm"
+    >
+      <el-row :gutter="30" class="demo-autocomplete searchFormRow">
         <!-- 商品ID/商品标题/品种 -->
         <el-col :span="8">
           <el-form-item prop="title">
@@ -78,7 +82,7 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <el-row :gutter="20">
+      <el-row :gutter="30" class="searchFormRow">
         <!-- 商品分类 -->
         <el-col :span="3">
           <el-form-item prop="classify">
@@ -117,7 +121,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="5" style="margin-top； 5px">
+        <el-col class="search-btn-col" :span="5">
           <el-button size="small" @click="handelSearch" type="primary"
             >查询</el-button
           >
@@ -252,4 +256,17 @@
   };
 </script>
 
-<style></style>
+<style lang="less" scoped>
+  .goodsSearchCard {
+    height: 130px;
+  }
+  .searchFormRow {
+    height: 50px;
+  }
+  .el-form-item {
+    margin-bottom: 0;
+  }
+  .search-btn-col {
+    margin-top: 5px;
+  }
+</style>

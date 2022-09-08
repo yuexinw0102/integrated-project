@@ -3,36 +3,45 @@
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage4"
-      :page-sizes="[100, 200, 300, 400]"
-      :page-size="100"
+      :current-page="page.currentPage"
+      :page-sizes="[10, 50, 100, 200]"
+      :page-size="page.pageSize"
       layout="total, prev, pager, next, sizes, jumper"
-      :total="400"
+      :total="page.pageTotal"
     >
     </el-pagination>
   </div>
 </template>
 
 <script>
-export default {
-  name: "Pagination",
-  props: {
-    },
+  import bus from "@/eventBus/eventBus.js";
+  export default {
+    name: "Pagination",
     data() {
       return {
-        currentPage1: 5,
-        currentPage2: 5,
-        currentPage3: 5,
-        currentPage4: 4,
+        page: {
+          currentPage: 1, // 当前页码
+          pageSize: 10,
+          pageTotal: 0,
+        },
+        allTableDatas: [],
+        tableDatas: [],
       };
     },
     methods: {
       handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+        // console.log(`每页 ${val} 条`);
+        bus.$emit("sizeChange", val);
       },
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        bus.$emit("currentChange", val);
       },
+    },
+    mounted() {
+      bus.$on("tableTotal", (val) => {
+        // console.log("分页组件接收tableTotal", val);
+        this.page.pageTotal = val;
+      });
     },
   };
 </script>
