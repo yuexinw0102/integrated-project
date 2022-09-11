@@ -14,6 +14,5 @@ Mock.mock("/warehouse", (req, res) => {
   }
   return {
     data: list,
-    count:list.length
   };
 });

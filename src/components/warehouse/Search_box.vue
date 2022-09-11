@@ -17,7 +17,7 @@
             }
         },
         mounted() {
-            console.log(this.data);
+
         },
         methods: {
         },

@@ -30,7 +30,7 @@ export default new Vuex.Store({
       key:"token",
       reducer: (state) => {
         return {
-          token: state
+          token: state.token,
         }
       }
     })
