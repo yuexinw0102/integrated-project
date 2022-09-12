@@ -1,9 +1,10 @@
 <template>
   <div class="block">
     <el-pagination
+    background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="page.currentPage"
+      :current-page.sync="page.currentPage"
       :page-sizes="[10, 50, 100, 200]"
       :page-size="page.pageSize"
       layout="total, prev, pager, next, sizes, jumper"
@@ -16,7 +17,8 @@
 <script>
   import bus from "@/eventBus/eventBus.js";
   export default {
-    name: "Pagination",
+  name: "GoodsProductPagination",
+    props: [],
     data() {
       return {
         page: {
@@ -24,26 +26,31 @@
           pageSize: 10,
           pageTotal: 0,
         },
-        allTableDatas: [],
-        tableDatas: [],
       };
     },
     methods: {
       handleSizeChange(val) {
-        // console.log(`每页 ${val} 条`);
+        // 发送变化的size
         bus.$emit("sizeChange", val);
       },
       handleCurrentChange(val) {
+        // 发送变化的页码
         bus.$emit("currentChange", val);
       },
     },
     mounted() {
+      // 获取数据总数
       bus.$on("tableTotal", (val) => {
         // console.log("分页组件接收tableTotal", val);
         this.page.pageTotal = val;
       });
     },
+    
   };
 </script>
 
-<style></style>
+<style lang="less" scoped>
+  .block {
+    padding: 20px;
+  }
+</style>

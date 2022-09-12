@@ -59,8 +59,10 @@
 				this.$refs["loginForm"].validate(async (valid) => {
 					if (valid) {
 						const { data } = await $http.login(this.form);
-						if (data.code == 200) {
+						if (data.status == "success") {
 							// this.$store.commit("set_token", data)
+							const token = data.tokenHeader + data.token;
+							sessionStorage.setItem('token', token); // 存入token
 							this[NAMES.set_token](data);
 							this.$router.replace("/home");
 						}

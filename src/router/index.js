@@ -41,6 +41,22 @@ const routes = [
           ),
       },
       {
+        path: "/product_list/edit",
+        name: "product_edit", // 商品管理-编辑商品页面
+        component: () =>
+          import(
+            /* webpackChunkName: "about" */ "../views/goods/product/AddOrEditView.vue"
+          ),
+      },
+      {
+        path: "/product_list/add",
+        name: "product_add", // 商品管理-新增商品页面
+        component: () =>
+          import(
+            /* webpackChunkName: "about" */ "../views/goods/product/AddOrEditView.vue"
+          ),
+      },
+      {
         path: "/classify_list",
         name: "classify",
         component: () =>
@@ -115,7 +131,7 @@ router.beforeEach((to, from, next) => {
     next();
   } else {
     const store = JSON.parse(sessionStorage.getItem("token"));
-    console.log(store);
+    // console.log(store);
     if (store === null || store === "" || store === undefined) {
       setTimeout(function () {
         next("/");
