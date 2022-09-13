@@ -1,7 +1,7 @@
 <template>
     <ContentView>
         <template #search_form>
-            <Search_box :get_data="data"></Search_box>
+            <Search_box></Search_box>
         </template>
         <template #data_table>
             <Table_area style="margin-top: 30px;margin-bottom:20px"></Table_area>
@@ -20,11 +20,6 @@
     import Pagination from "@/components/warehouse/Pagination.vue";
     export default {
         name: "AbsencesList",
-        
-        mounted() {
-        },
-        methods: {
-        },
         components: { ContentView, Search_box, Table_area,Pagination }
     }
 </script>

@@ -1,10 +1,15 @@
 <template>
   <el-row>
     <el-col>
-      <el-button style="margin-bottom: 10px" type="primary">新增仓库</el-button>
+      <el-button
+        style="margin-bottom: 10px"
+        type="primary"
+        @click="new_warehouse"
+        >新增仓库</el-button
+      >
       <el-table
         :data="
-          tableData.slice(
+          showData.slice(
             (page.page_num - 1) * page.page_size,
             page.page_num * page.page_size
           )
@@ -56,7 +61,7 @@ export default {
   created() {
     axios.get("/warehouse").then((res) => {
       this.tableData = res.data.data;
-      bus.$emit("get_count", res.data.data.length);
+      this.showData = this.tableData;
     });
   },
   mounted() {
@@ -65,8 +70,26 @@ export default {
     });
     bus.$on("size_change", (val) => {
       this.page.page_size = val;
-      this.page.page_num = 1; 
+      this.page.page_num = 1;
     });
+    bus.$on("query_form", (val) => {
+      this.showData = val;
+      if (val == null) {
+        this.showData = this.tableData;
+      }
+    });
+  },
+  methods: {
+    new_warehouse() {
+      this.$router.replace("/new_warehouse");
+    },
+  },
+  watch: {
+    showData: function (newVal, oldVal) {
+      if (newVal != oldVal) {
+        bus.$emit("get_count", this.showData.length);
+      }
+    },
   },
 };
 </script>

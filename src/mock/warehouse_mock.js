@@ -5,7 +5,7 @@ Mock.mock("/warehouse", (req, res) => {
   let list = [];
   for (let i = 0; i < 200; i++) {
     let listObject = {
-      name : Random.cname(),
+      name : Random.cword(5),
       city :Random.city(),
       area : Random.county(),
       acreage : Random.integer(100,500),

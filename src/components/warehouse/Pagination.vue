@@ -34,8 +34,6 @@ export default {
       bus.$emit("num_change", val);
     },
     handleSizeChange(val) {
-      // this.pager.page_size = val;
-      // this.pager.page_num = 1;
       bus.$emit("size_change", val);
     },
   },
