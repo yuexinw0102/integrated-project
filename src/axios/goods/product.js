@@ -8,8 +8,15 @@ export default new (class {
     });
   }
 
+  doSearch(form) {
+    
+    return $http.get(`${suffix}/getByPage.do`, {
+      params: form
+    });
+  }
+
   getById(id) { 
-    return $http.get(`${suffix}/getById`, {
+    return $http.get(`${suffix}/getById.do`, {
       params: {id: id}
     });
   }

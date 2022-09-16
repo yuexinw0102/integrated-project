@@ -17,22 +17,39 @@
             <el-col :span="12">
               <el-select
                 size="small"
-                v-model="form.state"
+                v-model="form.classify"
                 placeholder="请选择商品类别"
               >
-                <el-option label="蔬菜" value="vegetable"></el-option>
-                <el-option label="水果" value="fruit"></el-option>
+                <el-option label="新鲜蔬果" value="新鲜蔬果"></el-option>
+                <el-option label="休闲零食" value="休闲零食"></el-option>
+                <el-option label="肉禽蛋" value="肉禽蛋"></el-option>
+                <el-option label="酒水乳饮" value="酒水乳饮"></el-option>
+                <el-option label="粮油调味" value="粮油调味"></el-option>
+                <el-option label="品牌家电" value="品牌家电"></el-option>
+                <el-option label="美妆个护" value="美妆个护"></el-option>
+                <el-option label="个人百货" value="个人百货"></el-option>
               </el-select>
             </el-col>
 
             <el-col :span="12">
               <el-select
                 size="small"
-                v-model="form.state"
+                v-model="form.category"
                 placeholder="请选择商品类别"
               >
-                <el-option label="蔬菜" value="vegetable"></el-option>
-                <el-option label="水果" value="fruit"></el-option>
+                <el-option label="蔬菜" value="蔬菜"></el-option>
+                <el-option label="水果" value="水果"></el-option>
+                <el-option label="肉类" value="肉类"></el-option>
+                <el-option label="蛋类" value="蛋类"></el-option>
+                <el-option label="家禽类" value="家禽类"></el-option>
+                <el-option label="酒类" value="酒类"></el-option>
+                <el-option label="矿泉水" value="矿泉水"></el-option>
+                <el-option label="食用油" value="食用油"></el-option>
+                <el-option label="调味品" value="调味品"></el-option>
+                <el-option label="小家电" value="小家电"></el-option>
+                <el-option label="手机" value="手机"></el-option>
+                <el-option label="大家电" value="大家电"></el-option>
+                <el-option label="服饰" value="服饰"></el-option>
               </el-select>
             </el-col> </el-form-item
         ></el-col>
@@ -40,7 +57,7 @@
           <el-form-item label="商品品种">
             <el-input
               size="small"
-              v-model="form.title"
+              v-model="form.variety"
             ></el-input> </el-form-item
         ></el-col>
       </el-row>
@@ -85,7 +102,12 @@
       <el-row>
         <el-col :span="4">
           <el-form-item label="是否推荐">
-            <el-switch v-model="form.isRecommend"></el-switch></el-form-item
+            <el-select size="small" v-model="form.isRecommend" placeholder="是">
+              <el-option label="是" value="是"></el-option>
+              <el-option
+                label="否"
+                value="否"
+              ></el-option> </el-select></el-form-item
         ></el-col>
         <el-col :span="20">
           <el-form-item label="推荐理由">
@@ -100,7 +122,12 @@
       <el-row>
         <el-col>
           <el-form-item label="商品轮播">
-            <el-upload action="#" list-type="picture-card" :auto-upload="false">
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false"
+              :before-upload="beforeSlideShowUpload"
+            >
               <i slot="default" class="el-icon-plus"></i>
               <div slot="file" slot-scope="{ file }">
                 <img
@@ -116,14 +143,14 @@
                     <i class="el-icon-zoom-in"></i>
                   </span>
                   <span
-                    v-if="!form.goodsSlideshow.disabled"
+                    v-if="!goodsSlideShow.disabled"
                     class="el-upload-list__item-delete"
                     @click="handleDownload(file)"
                   >
                     <i class="el-icon-download"></i>
                   </span>
                   <span
-                    v-if="!form.goodsSlideshow.disabled"
+                    v-if="!goodsSlideShow.disabled"
                     class="el-upload-list__item-delete"
                     @click="handleRemove(file)"
                   >
@@ -131,13 +158,17 @@
                   </span>
                 </span>
               </div>
+              <template #tip>
+                <div style="font-size: 12px; color: #919191">
+                  只能上传.jpg/png文件，且不超过500kb
+                </div>
+              </template>
             </el-upload>
-            <el-dialog :visible.sync="form.goodsSlideshow.dialogVisible">
-              <img
-                width="100%"
-                :src="form.goodsSlideshow.dialogImageUrl"
-                alt=""
-              />
+            <el-dialog
+              v-if="goodsSlideShow"
+              :visible.sync="goodsSlideShow.dialogVisible"
+            >
+              <img width="100%" :src="form.slideShowImgUrl" alt="" />
               <!-- <div slot="tip" class="el-upload__tip">
               只能上传jpg/png文件，且不超过500kb
             </div> -->
@@ -164,14 +195,14 @@
                     <i class="el-icon-zoom-in"></i>
                   </span>
                   <span
-                    v-if="!form.goodsdetailPage.disabled"
+                    v-if="!goodsDetailPage.disabled"
                     class="el-upload-list__item-delete"
                     @click="handleDetailPageDownload(file)"
                   >
                     <i class="el-icon-download"></i>
                   </span>
                   <span
-                    v-if="!form.goodsdetailPage.disabled"
+                    v-if="!goodsDetailPage.disabled"
                     class="el-upload-list__item-delete"
                     @click="handleDetailPageRemove(file)"
                   >
@@ -179,13 +210,17 @@
                   </span>
                 </span>
               </div>
+              <template #tip>
+                <div style="font-size: 12px; color: #919191">
+                  只能上传.jpg/png文件，且不超过500kb
+                </div>
+              </template>
             </el-upload>
-            <el-dialog :visible.sync="form.goodsdetailPage.dialogVisible">
-              <img
-                width="100%"
-                :src="form.goodsdetailPage.dialogImageUrl"
-                alt=""
-              />
+            <el-dialog
+              v-if="goodsDetailPage"
+              :visible.sync="goodsDetailPage.dialogVisible"
+            >
+              <img width="100%" :src="form.slideShowImgUrl" alt="" />
               <!-- <div slot="tip" class="el-upload__tip">
               只能上传jpg/png文件，且不超过500kb
             </div> -->
@@ -195,7 +230,7 @@
       </el-row>
       <el-row
         ><el-form-item label="限时抢购">
-          <el-switch v-model="form.flashSale"></el-switch
+          <el-switch v-model="form.isFlashSale"></el-switch
         ></el-form-item>
       </el-row>
       <el-row>
@@ -236,7 +271,7 @@
       </el-row>
       <el-row
         ><el-form-item label="绿卡优惠">
-          <el-switch v-model="form.greenDiscounts"></el-switch
+          <el-switch v-model="form.isGreenDiscounts"></el-switch
         ></el-form-item>
       </el-row>
       <el-row>
@@ -267,21 +302,43 @@
 
 <script>
   import product from "@/axios/goods/product";
+  // import slideShow from "@/axios/goods/productSlideShow";
   export default {
     name: "ProductAddOrEdit",
     created() {
-      product.search().then(({ data }) => {
-        // console.log("search data", data);
-        this.list = data.data;
-        this.editIndex = this.$route.query.id;
-      });
-      if (this.editIndex) {
-        console.log("id", this.editIndex);
-        product.getById(this.editIndex).then(({ data }) => {
-          console.log("getById data", data);
-          this.form = data.data;
+      product
+        .search()
+        .then(({ data }) => {
+          // console.log("search data", data);
+          this.list = data.data;
+          let id_list = [];
+          this.list.forEach((item) => {
+            item.id = parseInt(item.id);
+            id_list.push(item.id);
+          });
+          this.maxId = Math.max(...id_list); // 获取最大索引值
+          this.editIndex = this.$route.query.id;
+          if (this.editIndex) {
+            // console.log("id", this.editIndex);
+            product
+              .getById(this.editIndex)
+              .then(({ data }) => {
+                // console.log("getById data", data);
+                this.form = data.data;
+                // console.log("getById this.form--", this.form);
+              })
+              .catch((err) => {
+                console.log("getById err", err);
+                return this.$message.error(
+                  `请求 ID：${this.editIndex} 数据失败！`
+                );
+              });
+          }
+        })
+        .catch((err) => {
+          console.log("search err", err);
+          return this.$message.error("请求所有数据失败！");
         });
-      }
     },
     props: {
       id: {
@@ -292,37 +349,42 @@
       return {
         editIndex: this.id,
         list: [],
+        maxId: 0,
         form: {
           id: "",
           title: "",
           desc: "", // 商品描述
           state: "",
           store: "",
-          weighit: "",
+          category: "", // 商品类别
+          variety: "", // 商品品种
+          weight: "",
           unit: "",
           isRecommend: "",
           recommendResult: "", // 推荐理由
           classify: "",
           nowPrice: "",
           originalPrice: "",
-          // 存放商品轮播图
-          goodsSlideshow: {
-            dialogImageUrl: "",
-            dialogVisible: false,
-            disabled: false,
-          },
-          //   存放商品详情页图
-          goodsdetailPage: {
-            dialogImageUrl: "",
-            dialogVisible: false,
-            disabled: false,
-          },
-          flashSale: "", // 限时抢购
+          slideShowImgUrl: [], // 存放商品轮播图url
+          detailPageImgUrl: [], // 存放商品详情页图url
+          isFlashSale: "", // 限时抢购
           flashSalePrice: "", // 抢购价格
           startDate: "", // 开始抢购时间
           endDate: "", // 结束抢购时间
-          greenDiscounts: "", // 绿卡优惠
+          isGreenDiscounts: "", // 绿卡优惠
           greenPrice: "", // 绿卡价格
+        },
+        // 存放商品轮播图
+        goodsSlideShow: {
+          // dialogImageUrl: "",
+          dialogVisible: false,
+          disabled: false,
+        },
+        //   存放商品详情页图
+        goodsDetailPage: {
+          // dialogImageUrl: "",
+          dialogVisible: false,
+          disabled: false,
         },
         loading: false,
         timer: null,
@@ -338,14 +400,42 @@
               //   done();
               setTimeout(() => {
                 this.loading = false;
-                if (this.id) {
+                if (this.editIndex) {
+                  console.log("this.form--", this.form);
                   product.edit(this.form).then(({ data }) => {
-                    alert(data.message);
+                    console.log("edit data--", data);
+                    // alert(data.message);
+                    if (data.status == "success") {
+                      this.$message({
+                        message: data.message,
+                        type: "success",
+                      });
+                    } else {
+                      this.$message.error(data.err.sqlMessage);
+                    }
                   });
                 } else {
+                  this.form.id = parseInt(this.maxId) + 1;
+                  console.log("add form--", this.form);
                   product.add(this.form).then(({ data }) => {
-                    alert(data.message);
+                    console.log("add data--", data);
+                    // alert(data.message);
+                    if (data.status == "success") {
+                      this.$message({
+                        message: data.message,
+                        type: "success",
+                      });
+                    } else {
+                      this.$message.error(data.err.sqlMessage);
+                    }
                   });
+                  /*  console.log(this.goodsSlideShow);
+                  slideShow
+                    .add(this.form)
+                    .then(({ data }) => {
+                      console.log("slideShow data", data);
+                    })
+                    .catch(() => {}); */
                 }
                 this.$router.back(); // 编辑之后回退页面
               }, 400);
@@ -360,15 +450,40 @@
         this.$router.back();
       },
 
+      // 上传图片
+      /* handleUploadImg(data) {
+        console.log("Uploading image data", data);
+        const formData = new FormData();
+        formData.append("avatar", data.file);
+        formData.append("imgId", this.editIndex);
+        // formData.append("materialType", data.file);
+      }, */
+
+      // 转码处理函数
+      beforeSlideShowUpload(file) {
+        let _this = this;
+        return new Promise((resolve, reject) => { 
+          let reader = new FileReader();
+          reader.readAsDataURL(file); // 转换成base64
+          reader.onload = (event) => {
+            console.log('event', event);
+            _this.form.slideShowImgUrl.push(event.target.result); // 定义参数获取图片路径
+          }
+        })
+      },
+
       //   上传商品轮播图相关方法
-      handleRemove(file) {
+      handleRemove(file) { // 移出图片
         console.log(file);
       },
-      handlePictureCardPreview(file) {
-        this.goodsSlideshow.dialogImageUrl = file.url;
-        this.goodsSlideshow.dialogVisible = true;
+      handlePictureCardPreview(file) { // 预览图片
+        console.log(this.goodsSlideShow);
+        console.log(file);
+        this.form.slideShowImgUrl = file.url;
+        this.goodsSlideShow.dialogVisible = true;
       },
       handleDownload(file) {
+        // 下载商品轮播图
         console.log(file);
       },
 
@@ -377,8 +492,8 @@
         console.log(file);
       },
       handleDetailPagePictureCardPreview(file) {
-        this.goodsdetailPage.dialogImageUrl = file.url;
-        this.goodsdetailPage.dialogVisible = true;
+        this.form.slideShowImgUrl = file.url;
+        this.form.goodsDetailPage.dialogVisible = true;
       },
       handleDetailPageDownload(file) {
         console.log(file);

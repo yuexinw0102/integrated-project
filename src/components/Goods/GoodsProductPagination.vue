@@ -8,7 +8,7 @@
       :page-sizes="[10, 50, 100, 200]"
       :page-size="page.pageSize"
       layout="total, prev, pager, next, sizes, jumper"
-      :total="page.pageTotal"
+      :total="total"
     >
     </el-pagination>
   </div>
@@ -18,7 +18,7 @@
   import bus from "@/eventBus/eventBus.js";
   export default {
   name: "GoodsProductPagination",
-    props: [],
+    props: ['total'], // total数据显示总数
     data() {
       return {
         page: {
@@ -40,10 +40,10 @@
     },
     mounted() {
       // 获取数据总数
-      bus.$on("tableTotal", (val) => {
-        // console.log("分页组件接收tableTotal", val);
-        this.page.pageTotal = val;
-      });
+      // bus.$on("tableTotal", (val) => {
+      //   // console.log("分页组件接收tableTotal", val);
+      //   this.page.pageTotal = val;
+      // });
     },
     
   };

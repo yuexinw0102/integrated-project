@@ -150,7 +150,10 @@
             <div slot="header" class="clearfix">
               <span style="font-size: 14px"
                 >查询结果：共计
-                <span style="font-weight: bold">0</span>&nbsp;条数据</span
+                <span style="font-weight: bold">{{
+                  searchListTotal ? searchListTotal : 0
+                }}</span>
+                条数据</span
               >
               <el-button
                 style="float: right; padding: 7px"
@@ -210,12 +213,15 @@
     >
     <!-- 分页插槽 -->
     <template v-slot:pagination>
-      <Pagination></Pagination>
+      <Pagination
+        :total="searchFlag ? searchList.length : tableData.length"
+      ></Pagination>
     </template>
   </ContentView>
 </template>
 
 <script>
+  // searchFlag ? searchList : showDatas
   import axios from "axios";
   import bus from "@/eventBus/eventBus.js"; // 引入兄弟组件传值中间件
   import ContentView from "@/components/ContentView.vue";
@@ -228,6 +234,7 @@
     data() {
       return {
         tableData: [], // 数据总数
+        searchListTotal: 0,
         page: {
           currentPage: 1, // 当前页码
           pageSize: 10,
@@ -245,7 +252,8 @@
           nowPrice: "",
           originalPrice: "",
         },
-        searchList: [], // 测试数据
+        searchFlag: false, // 是否开始搜索,控制分页
+        searchList: [], // 存放搜索数据
         searchRes: [],
         state1: "",
       };
@@ -259,25 +267,49 @@
       bus.$on("sizeChange", (val) => {
         this.page.pageSize = val;
         this.page.currentPage = 1; // size变化时页码置为1
-        this.showDatas = this.tableData.filter((item, index) => {
-          return index < val;
-        });
+        if (this.searchFlag || this.searchList) {
+          console.log("Searching", this.searchList);
+          // 当开始搜索时
+          this.showDatas = this.searchList.filter((item, index) => {
+            return index < val;
+          });
+        } else {
+          // 默认
+          this.showDatas = this.tableData.filter((item, index) => {
+            return index < val;
+          });
+        }
       });
       bus.$on("currentChange", (val) => {
         // console.log("currentChange接收", val);
         let size = this.page.pageSize * (val - 1);
         let num = this.page.pageSize * val;
         let tables = []; //
-        for (let i = size; i < num; i++) {
-          if (this.tableData[i]) {
-            tables.push(this.tableData[i]);
+        if (this.searchFlag || this.searchList) {
+          console.log("Searching", this.searchList);
+          // 当开始搜索时
+          for (let i = size; i < num; i++) {
+            if (this.searchList[i]) {
+              tables.push(this.searchList[i]);
+            }
+            this.showDatas = tables;
           }
-          this.showDatas = tables;
+          console.log("currentChange searchFlag--", this.searchFlag);
+        } else {
+          for (let i = size; i < num; i++) {
+            if (this.tableData[i]) {
+              tables.push(this.tableData[i]);
+            }
+            this.showDatas = tables;
+          }
         }
       });
       // '商品ID/商品标题/品种'搜索框相关
       this.searchRes = this.loadAll();
     },
+    // updated() {
+    //   console.log("Searching", this.searchList);
+    // },
     methods: {
       // 获取表格数据
       /* handleGetData() {
@@ -318,20 +350,21 @@
             // console.log("data", data);
             if (data.status == "success") {
               this.tableData = data.data;
-              this.setPageinations(); // 设置默认分页数据
-              bus.$emit("tableTotal", this.tableData.length);
+              this.setPageinations(this.tableData); // 设置默认分页数据
+              // bus.$emit("tableTotal", this.tableData.length);
             }
           })
           .catch((err) => this.$message.error(err));
       },
       // 设置分页相关数据
-      setPageinations() {
-        this.page.pageTotal = this.tableData.length;
+      setPageinations(data) {
+        // 传入要显示的数据
+        this.page.pageTotal = data.length;
         this.page.pageSize = 10;
         this.page.currentPage = 1;
         // console.log("setPageinations 页码", this.page.currentPage);
         // 默认显示的表格数据
-        this.showDatas = this.tableData.filter((item, index) => {
+        this.showDatas = data.filter((item, index) => {
           return index < this.page.pageSize;
         });
         // console.log(this.showDatas);
@@ -360,7 +393,7 @@
 
       // 编辑
       handleTableEdit(index, row) {
-        console.log(index, row);
+        console.log("handleTableEdit --", index, row);
         this.$router.push({
           path: "/product_list/edit",
           query: {
@@ -371,25 +404,24 @@
 
       //   查询按钮（搜索）
       handelSearch() {
-        this.handleGetData(); // 没有搜索条件时，默认请求后台数据
-        console.log("handelSearch 查询");
-        let text = this.goodsSearchForm; // 保存搜索框输入的内容
-        console.log(text);
-        let reg = new RegExp(JSON.stringify(text)); // 定义正则表达式规则
-        console.log("reg", reg);
-        this.showDatas = this.tableData.filter((item, index) => {
-          return reg.test(item); // 返回符合条件的数据
-        });
-        console.log(this.showDatas);
-        /* let formList = {};
-        for (let k in this.goodsSearchForm) {
-          let res = this.goodsSearchForm[k];
-          if (res) {
-            formList[`${k}`] = res;
-          }
-        }
-        console.log(formList);
-        console.log(this.showDatas); */
+        product
+          .doSearch(this.goodsSearchForm)
+          .then(({ data }) => {
+            if (data.status == "success") {
+              this.searchFlag = true;
+              console.log("search data--", data);
+              this.searchListTotal = data.data.length; // 查询后数据显示总数
+              this.searchList = data.data; // 查询后的数据
+              this.showDatas = this.searchList; // 查询后的数据
+              this.setPageinations(this.searchList); // 设置分页数据
+            }
+            console.log("doSearch searchFlag--", this.searchFlag);
+          })
+          .catch((err) => {
+            console.log("search err--", err);
+            this.$message.error("error error搜索失败！");
+          });
+        this.searchFlag = false; // 关闭搜索开关
       },
 
       // '商品ID/商品标题/品种'搜索框相关方法开始
