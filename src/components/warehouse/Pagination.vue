@@ -25,16 +25,16 @@ export default {
     };
   },
   mounted() {
-    bus.$on("get_count",(val)=>{
+    bus.$on("warehouse_get_count",(val)=>{
       this.page.page_count = val;
     })
   },
   methods: {
     handleCurrentChange(val) {
-      bus.$emit("num_change", val);
+      bus.$emit("warehouse_num_change", val);
     },
     handleSizeChange(val) {
-      bus.$emit("size_change", val);
+      bus.$emit("warehouse_size_change", val);
     },
   },
 };

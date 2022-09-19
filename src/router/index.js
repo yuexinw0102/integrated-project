@@ -63,6 +63,14 @@ const routes = [
           ),
       },
       {
+        path: "/new_warehouse",
+        name: "new_warehouse", // 上面的name应该写在这里
+        component: () =>
+          import(
+            /* webpackChunkName: "welcome" */ "../views/warehouse/AddOrEditView.vue"
+          ),
+      },
+      {
         path: "/sorting",
         name: "sorting",
         component: () =>

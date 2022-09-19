@@ -1,29 +1,25 @@
 <template>
-    <ContentView>
-        <template #search_form>
-            <Search_box></Search_box>
-        </template>
-        <template #data_table>
-            <Table_area style="margin-top: 30px;margin-bottom:20px"></Table_area>
-        </template>
-        <template v-slot:pagination>
-            <Pagination></Pagination>
-        </template>
-    </ContentView>
-
+  <ContentView>
+    <template #search_form>
+      <span>仓库管理</span>
+      <Search_box style="height:auto"></Search_box>
+    </template>
+    <template #data_table>
+      <Table_area style="margin-bottom:5px;"></Table_area>
+    </template>
+    <template v-slot:pagination>
+      <Pagination></Pagination>
+    </template>
+  </ContentView>
 </template>
 
 <script>
-    import ContentView from "@/components/ContentView.vue";
-    import Search_box from "@/components/warehouse/Search_box.vue";
-    import Table_area from "@/components/warehouse/Table_area.vue";
-    import Pagination from "@/components/warehouse/Pagination.vue";
-    export default {
-        name: "AbsencesList",
-        components: { ContentView, Search_box, Table_area,Pagination }
-    }
+import ContentView from "@/components/ContentView.vue";
+import Search_box from "@/components/warehouse/Search_box.vue";
+import Table_area from "@/components/warehouse/Table_area.vue";
+import Pagination from "@/components/warehouse/Pagination.vue";
+export default {
+  name: "AbsencesList",
+  components: { ContentView, Search_box, Table_area, Pagination },
+};
 </script>
-
-<style>
-
-</style>

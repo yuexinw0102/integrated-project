@@ -5,6 +5,7 @@
         style="margin-bottom: 10px"
         type="primary"
         @click="new_warehouse"
+        size="small"
         >新增仓库</el-button
       >
       <el-table
@@ -16,26 +17,55 @@
         "
         border
         style="width: 100%; overflow: auto"
-        height="475"
-        stripe
+        height="450"
         v-infinite-scroll="load"
+        :row-class-name="state"
       >
         <el-table-column prop="name" label="仓库名称"> </el-table-column>
-        <el-table-column prop="city" label="所在城市"> </el-table-column>
-        <el-table-column prop="area" label="所在区域"> </el-table-column>
+        <el-table-column prop="city.val" label="所在城市"> </el-table-column>
+        <el-table-column prop="area.val" label="所在区域"> </el-table-column>
         <el-table-column prop="date" label="仓库地址">
           <template slot-scope="scope">
-            <el-button type="text" size="small">查看</el-button>
+            <el-popover trigger="click" placement="top">
+              <p>所在城市: {{ scope.row.city.val }}</p>
+              <p>所在区域: {{ scope.row.area.val }}</p>
+              <p>详细地址: {{ scope.row.detailed_address }}</p>
+              <div slot="reference" class="name-wrapper">
+                <el-button type="text" size="small">查看</el-button>
+              </div>
+            </el-popover>
           </template>
         </el-table-column>
         <el-table-column prop="acreage" label="仓库面积"> </el-table-column>
-        <el-table-column prop="date" label="关联小区数"> </el-table-column>
-        <el-table-column prop="date" label="骑手数"> </el-table-column>
-        <el-table-column prop="date" label="分拣员数"> </el-table-column>
-        <el-table-column prop="date" label="操作">
+        <el-table-column prop="community.length" label="关联小区数">
+        </el-table-column>
+        <el-table-column prop="rider.length" label="骑手数"> </el-table-column>
+        <el-table-column prop="sorting.length" label="分拣员数">
+        </el-table-column>
+        <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small">仓库详情</el-button>
-            <el-button type="text" size="small">停用</el-button>
+            <el-button
+              v-if="scope.row.state == 1"
+              type="text"
+              size="small"
+              @click="new_warehouse(scope.row.id)"
+              >仓库详情</el-button
+            >
+            <el-button v-else type="text" size="small" disabled></el-button>
+            <el-button
+              v-if="scope.row.state == 1"
+              type="text"
+              size="small"
+              @click="disable(scope.row.id)"
+              >停用</el-button
+            >
+            <el-button
+              v-else
+              type="text"
+              size="small"
+              @click="enable(scope.row.id)"
+              >启用</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -43,7 +73,11 @@
   </el-row>
 </template>
 
-<style></style>
+<style>
+.el-table .warning-row {
+  background-color: oldlace;
+}
+</style>
 <script>
 import axios from "axios";
 import bus from "@/eventBus/eventBus";
@@ -65,14 +99,14 @@ export default {
     });
   },
   mounted() {
-    bus.$on("num_change", (val) => {
+    bus.$on("warehouse_num_change", (val) => {
       this.page.page_num = val;
     });
-    bus.$on("size_change", (val) => {
+    bus.$on("warehouse_size_change", (val) => {
       this.page.page_size = val;
       this.page.page_num = 1;
     });
-    bus.$on("query_form", (val) => {
+    bus.$on("warehouse_query_form", (val) => {
       this.showData = val;
       if (val == null) {
         this.showData = this.tableData;
@@ -80,14 +114,40 @@ export default {
     });
   },
   methods: {
-    new_warehouse() {
-      this.$router.replace("/new_warehouse");
+    new_warehouse(id) {
+      if (id == "") {
+        this.$router.replace("/new_warehouse");
+        bus.$emit("modify");
+      } else {
+        this.$router.replace("/new_warehouse");
+        let data = this.showData.filter((item) => item.id == id);
+        bus.$emit("modify", data);
+      }
+    },
+    state({ row, rowIndex }) {
+      if (row.state === 0) {
+        return "warning-row";
+      }
+    },
+    disable(id) {
+      this.showData.forEach((item) => {
+        if (item.id === id) {
+          item.state = 0;
+        }
+      });
+    },
+    enable(id) {
+      this.showData.forEach((item) => {
+        if (item.id === id) {
+          item.state = 1;
+        }
+      });
     },
   },
   watch: {
     showData: function (newVal, oldVal) {
       if (newVal != oldVal) {
-        bus.$emit("get_count", this.showData.length);
+        bus.$emit("warehouse_get_count", this.showData.length);
       }
     },
   },

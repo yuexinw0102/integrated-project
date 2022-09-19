@@ -1,18 +1,41 @@
 const Mock = require("mockjs");
 // 获取 mock.Random 对象
 const Random = Mock.Random;
-Mock.mock("/warehouse", (req, res) => {
-  let list = [];
-  for (let i = 0; i < 200; i++) {
-    let listObject = {
-      name : Random.cword(5),
-      city :Random.city(),
-      area : Random.county(),
-      acreage : Random.integer(100,500),
-    };
-    list.push(listObject);
-  }
-  return {
-    data: list,
-  };
+let data = Mock.mock("/warehouse", {
+  "data|200": [
+    {
+      "id|+1":1,
+      "name": "@csentence(3)",
+      "city": {
+        "key|+1": 1,
+        "val": "@city",
+        "disabled": false
+      },
+      "area": {
+        "key|+1": 1,
+        "val": "@county()",
+        "disabled": false
+      },
+      "detailed_address": "@csentence(10)",
+      "acreage": "@integer(100, 500)",
+      "community|2-4": [{
+        "name": "@cword(3)",
+        "address": "苏州市新区某某街道花园小区",
+      }],
+      "rider|2-4": [{
+        "name": "@cname()",
+        "phone": /1[3-9]\d{9}/,
+      }],
+      "sorting|2-4": [{
+        "name": "@cname()",
+        "phone": /1[3-9]\d{9}/,
+      }],
+      state:1
+    },
+  ],
 });
+module.exports = function (app) {
+  app.use((req, res) => {
+    res.json(data);
+  });
+};
