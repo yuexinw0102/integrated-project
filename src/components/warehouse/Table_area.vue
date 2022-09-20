@@ -4,7 +4,7 @@
       <el-button
         style="margin-bottom: 10px"
         type="primary"
-        @click="new_warehouse"
+        @click="new_warehouse()"
         size="small"
         >新增仓库</el-button
       >
@@ -51,7 +51,6 @@
               @click="new_warehouse(scope.row.id)"
               >仓库详情</el-button
             >
-            <el-button v-else type="text" size="small" disabled></el-button>
             <el-button
               v-if="scope.row.state == 1"
               type="text"
@@ -81,6 +80,8 @@
 <script>
 import axios from "axios";
 import bus from "@/eventBus/eventBus";
+import { mapMutations } from "vuex";
+import { NAMES } from "@/store";
 export default {
   data() {
     return {
@@ -115,13 +116,16 @@ export default {
   },
   methods: {
     new_warehouse(id) {
-      if (id == "") {
+      if (typeof id !== "number") {
+        console.log(id);
         this.$router.replace("/new_warehouse");
-        bus.$emit("modify");
+        this[NAMES.set_warehouseEditor]("新增仓库");
       } else {
+        console.log(id);
         this.$router.replace("/new_warehouse");
         let data = this.showData.filter((item) => item.id == id);
         bus.$emit("modify", data);
+        this[NAMES.set_warehouseEditor]("仓库详情");
       }
     },
     state({ row, rowIndex }) {
@@ -143,6 +147,7 @@ export default {
         }
       });
     },
+    ...mapMutations([NAMES.set_warehouseEditor]),
   },
   watch: {
     showData: function (newVal, oldVal) {

@@ -62,7 +62,7 @@
         v-model.number="query_form.input_community"
         style="width: 200px"
         size="small"
-        placeholder="关联小区数 ~ 关联小区数"
+        placeholder="关联小区数"
       ></el-input>
     </el-form-item>
 
@@ -71,7 +71,7 @@
         v-model.number="query_form.input_rider"
         style="width: 200px"
         size="small"
-        placeholder="骑手数 ~ 骑手数"
+        placeholder="骑手数"
       ></el-input>
     </el-form-item>
 
@@ -80,7 +80,7 @@
         v-model.number="query_form.input_sorting"
         style="width: 205px"
         size="small"
-        placeholder="分拣员数 ~ 分拣员数"
+        placeholder="分拣员数"
       ></el-input>
     </el-form-item>
 
@@ -145,12 +145,27 @@ export default {
   methods: {
     submitForm() {
       this.showData = this.tableData.filter((item) => {
-        return (
-          item.city.key == this.query_form.city_value ||
-          item.area.key == this.query_form.area_value ||
-          item.name.indexOf(this.query_form.input_name) >= 0 ||
-          item.acreage.indexOf(this.query_form.input_acreage) >= 0
-        );
+        if (this.query_form.input_name !== "") {
+          return item.name.indexOf(this.query_form.input_name) !== -1;
+        }
+        if (
+          this.query_form.city_value !== "" ||
+          this.query_form.area_value !== "" ||
+          this.query_form.input_community !== "" ||
+          this.query_form.input_rider !== "" ||
+          this.query_form.input_sorting !== ""
+        ) {
+          return (
+            item.city.val === this.query_form.city_value ||
+            item.area.val === this.query_form.area_value ||
+            item.community.length === this.query_form.input_community ||
+            item.rider.length === this.query_form.input_rider ||
+            item.sorting.length === this.query_form.input_sorting
+          );
+        }
+        if (this.query_form.input_acreage !== "") {
+          return item.acreage >= this.query_form.input_acreage;
+        }
       });
     },
     resetForm(formName) {
@@ -160,8 +175,6 @@ export default {
   },
   watch: {
     showData: function (newVal, oldVal) {
-      console.log(oldVal);
-      console.log(newVal);
       if (newVal != oldVal) {
         bus.$emit("warehouse_query_form", newVal);
       }

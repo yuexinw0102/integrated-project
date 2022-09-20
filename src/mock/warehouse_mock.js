@@ -5,16 +5,14 @@ let data = Mock.mock("/warehouse", {
   "data|200": [
     {
       "id|+1":1,
-      "name": "@csentence(3)",
+      "name": "@ctitle(3)",
       "city": {
         "key|+1": 1,
         "val": "@city",
-        "disabled": false
       },
       "area": {
         "key|+1": 1,
         "val": "@county()",
-        "disabled": false
       },
       "detailed_address": "@csentence(10)",
       "acreage": "@integer(100, 500)",
