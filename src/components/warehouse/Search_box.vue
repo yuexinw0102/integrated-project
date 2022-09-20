@@ -108,7 +108,7 @@ export default {
     return {
       area: [],
       city: [],
-      tableData: [],
+      tableData: JSON.parse(localStorage.getItem("warehouseData")),
       showData: [],
       query_form: {
         city_value: "",
@@ -122,24 +122,22 @@ export default {
     };
   },
   created() {
-    axios.get("/warehouse").then((res) => {
-      this.tableData = res.data.data;
-      let city = [];
-      let area = [];
-      this.tableData.forEach((item, index) => {
-        city.push({ label: item.city.val, disabled: false });
-        area.push({ label: item.area.val, disabled: false });
-      });
-      let obj = {};
-      this.city = city.reduce(function (item, next) {
-        obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
-        return item;
-      }, []);
-      this.area = area.reduce(function (item, next) {
-        obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
-        return item;
-      }, []);
+    this.showData = this.tableData
+    let city = [];
+    let area = [];
+    this.tableData.forEach((item, index) => {
+      city.push({ label: item.city.val, disabled: false });
+      area.push({ label: item.area.val, disabled: false });
     });
+    let obj = {};
+    this.city = city.reduce(function (item, next) {
+      obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
+      return item;
+    }, []);
+    this.area = area.reduce(function (item, next) {
+      obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
+      return item;
+    }, []);
   },
   mounted() {},
   methods: {

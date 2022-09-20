@@ -18,7 +18,6 @@
         border
         style="width: 100%; overflow: auto"
         height="450"
-        v-infinite-scroll="load"
         :row-class-name="state"
       >
         <el-table-column prop="name" label="仓库名称"> </el-table-column>
@@ -78,28 +77,22 @@
 }
 </style>
 <script>
-import axios from "axios";
 import bus from "@/eventBus/eventBus";
 import { mapMutations } from "vuex";
 import { NAMES } from "@/store";
 export default {
   data() {
     return {
+      tableData: JSON.parse(localStorage.getItem("warehouseData")),
       showData: [],
-      tableData: [],
       page: {
         page_size: 10,
         page_num: 1,
       },
     };
   },
-  created() {
-    axios.get("/warehouse").then((res) => {
-      this.tableData = res.data.data;
-      this.showData = this.tableData;
-    });
-  },
   mounted() {
+    this.showData = this.tableData
     bus.$on("warehouse_num_change", (val) => {
       this.page.page_num = val;
     });
@@ -117,14 +110,12 @@ export default {
   methods: {
     new_warehouse(id) {
       if (typeof id !== "number") {
-        console.log(id);
         this.$router.replace("/new_warehouse");
+        this[NAMES.set_warehouseDataId]("");
         this[NAMES.set_warehouseEditor]("新增仓库");
       } else {
-        console.log(id);
         this.$router.replace("/new_warehouse");
-        let data = this.showData.filter((item) => item.id == id);
-        bus.$emit("modify", data);
+        this[NAMES.set_warehouseDataId](id);
         this[NAMES.set_warehouseEditor]("仓库详情");
       }
     },
@@ -147,7 +138,7 @@ export default {
         }
       });
     },
-    ...mapMutations([NAMES.set_warehouseEditor]),
+    ...mapMutations([NAMES.set_warehouseEditor, NAMES.set_warehouseDataId]),
   },
   watch: {
     showData: function (newVal, oldVal) {

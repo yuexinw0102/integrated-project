@@ -19,7 +19,7 @@ import Search_box from "@/components/warehouse/Search_box.vue";
 import Table_area from "@/components/warehouse/Table_area.vue";
 import Pagination from "@/components/warehouse/Pagination.vue";
 export default {
-  name: "AbsencesList",
+  name: "ListView",
   components: { ContentView, Search_box, Table_area, Pagination },
 };
 </script>
