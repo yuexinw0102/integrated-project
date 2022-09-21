@@ -66,7 +66,109 @@
           <el-input placeholder="仓库面积" v-model="form.acreage"></el-input>
         </el-form-item>
 
-        <el-form-item> </el-form-item>
+        <el-form-item label="关联小区" type="flex" justify="">
+          <el-input
+            placeholder="请输入小区名称"
+            v-model="form.search_community"
+            style="width: 200px"
+          ></el-input>
+          <el-button type="primary">查询</el-button>
+          <el-button type="primary">新增小区</el-button>
+          <el-table
+            :data="form.community"
+            style="width: 100%"
+            border
+            size="small"
+          >
+            <el-table-column prop="name" label="小区名称" width="auto">
+            </el-table-column>
+            <el-table-column prop="address" label="小区地址" width="auto">
+            </el-table-column>
+            <el-table-column label="操作">
+              <el-button type="text" size="small">删除</el-button>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+
+        <el-form-item label="配置骑手" type="flex" justify="">
+          <el-input
+            placeholder="请输入骑手名称"
+            v-model="form.search_community"
+            style="width: 200px"
+          ></el-input>
+          <el-button type="primary">查询</el-button>
+          <el-button type="primary">新增骑手</el-button>
+          <el-table
+            :data="form.rider"
+            style="width: 100%"
+            :row-class-name="state"
+            border
+            size="small"
+          >
+            <el-table-column prop="name" label="骑手名称" width="auto">
+            </el-table-column>
+            <el-table-column prop="phone" label="手机号" width="auto">
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  v-if="scope.row.state == 1"
+                  type="text"
+                  size="small"
+                  @click="disable(scope.row.name, 1)"
+                  >停用</el-button
+                >
+                <el-button
+                  v-else
+                  type="text"
+                  size="small"
+                  @click="enable(scope.row.name, 1)"
+                  >启用</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+
+        <el-form-item label="配置分拣员" type="flex" justify="">
+          <el-input
+            placeholder="请输入分拣员名称"
+            v-model="form.search_community"
+            style="width: 200px"
+          ></el-input>
+          <el-button type="primary">查询</el-button>
+          <el-button type="primary">新增分拣员</el-button>
+          <el-table
+            :data="form.sorting"
+            style="width: 100%"
+            border
+            size="small"
+            :row-class-name="state"
+          >
+            <el-table-column prop="name" label="分拣员名称" width="auto">
+            </el-table-column>
+            <el-table-column prop="phone" label="手机号" width="auto">
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  v-if="scope.row.state == 1"
+                  type="text"
+                  size="small"
+                  @click="disable(scope.row.name, 2)"
+                  >停用</el-button
+                >
+                <el-button
+                  v-else
+                  type="text"
+                  size="small"
+                  @click="enable(scope.row.name, 2)"
+                  >启用</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
 
         <el-form-item>
           <el-button @click="back()">返回</el-button>
@@ -92,10 +194,11 @@
 .clearfix:after {
   clear: both;
 }
+.el-table .warning-row {
+  background-color: oldlace;
+}
 </style>
 <script>
-import { NAMES } from "@/store";
-import axios from "axios";
 import VDistpicker from "v-distpicker";
 import { mapState } from "vuex";
 export default {
@@ -105,15 +208,17 @@ export default {
       showData: JSON.parse(localStorage.getItem("warehouseData")),
       area: "",
       city: "",
+      detailed_address: "",
+      search_community: "",
       form: {
+        id:'',
         name: "",
         area: "",
         city: "",
-        detailed_address: "",
         acreage: "",
-        community: "",
-        rider: "",
-        sorting: "",
+        community: [],
+        rider: [],
+        sorting: [],
       },
       selected: {
         province: "",
@@ -146,6 +251,43 @@ export default {
       this.selected.province = province.value;
       this.selected.city = city.value;
       this.selected.area = area.value;
+    },
+    state({ row, rowIndex }) {
+      if (row.state === 0) {
+        return "warning-row";
+      } else {
+        return "";
+      }
+    },
+    disable(name, dataName) {
+      if (dataName == 1) {
+        this.form.rider.forEach((item1) => {
+          if (item1.name === name) {
+            item1.state = 0;
+          }
+        });
+      } else {
+        this.form.sorting.forEach((item1) => {
+          if (item1.name === name) {
+            item1.state = 0;
+          }
+        });
+      }
+    },
+    enable(name, dataName) {
+      if (dataName == 1) {
+        this.form.rider.forEach((item1) => {
+          if (item1.name === name) {
+            item1.state = 1;
+          }
+        });
+      } else {
+        this.form.sorting.forEach((item1) => {
+          if (item1.name === name) {
+            item1.state = 1;
+          }
+        });
+      }
     },
   },
   created() {

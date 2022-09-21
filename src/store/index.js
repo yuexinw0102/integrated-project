@@ -23,7 +23,7 @@ export default new Vuex.Store({
   },
   mutations: {
     [NAMES.set_token](state, payload) {
-      state.token = payload.token_header + payload.token;
+      state.token = payload.tokenHeader + payload.token;
     },
     [NAMES.set_warehouseEditor](state, payload) {
       state.warehouseEditor = payload;

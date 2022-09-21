@@ -83,16 +83,22 @@ export default {
       this.$refs["loginForm"].validate(async (valid) => {
         if (valid) {
           const { data } = await $http.login(this.form);
+          console.log(data);
           if (data.code == 200) {
             this[NAMES.set_token](data);
             this.$router.replace("/home");
-            if (localStorage.getItem("warehouseData") == "") {
+            if (
+              localStorage.getItem("warehouseData") == "" ||
+              localStorage.getItem("warehouseData") == null ||
+              localStorage.getItem("warehouseData") == undefined
+            ) {
               axios.get("/warehouse").then((res) => {
-                localStorage.setItem("warehouseData", JSON.stringify(res.data.data));
+                localStorage.setItem(
+                  "warehouseData",
+                  JSON.stringify(res.data.data)
+                );
               });
-            }else{
-				localStorage.setItem("warehouseData",'');
-			}
+            }
           }
         }
       });

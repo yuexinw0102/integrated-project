@@ -1,8 +1,14 @@
 <template>
-  <el-col style="height: 100%;">
-    <el-menu default-active="/welcome" class="el-menu-vertical-demo"
-      background-color="#545c64" text-color="#fff" active-text-color="#ffd04b"
-      style="height: 100%;" router="true">
+  <el-col style="height: 100%">
+    <el-menu
+      default-active="/welcome"
+      class="el-menu-vertical-demo"
+      background-color="#545c64"
+      text-color="#fff"
+      active-text-color="#ffd04b"
+      style="height: 100%"
+      router
+    >
       <el-menu-item index="/welcome">
         <i class="el-icon-s-grid"></i>
         <span slot="title">首页</span>
@@ -19,7 +25,7 @@
         <el-menu-item-group>
           <el-menu-item index="/product_list">商品列表</el-menu-item>
           <el-menu-item index="/classify_list">分类列表</el-menu-item>
-        </el-menu-item-group> 
+        </el-menu-item-group>
       </el-submenu>
       <el-submenu index="2">
         <template slot="title">
@@ -58,12 +64,10 @@
 </template>
 
 <script>
-  export default {
-    name: 'HelloWorld',
-  }
+export default {
+  name: "HelloWorld",
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="less">
- 
-</style>
+<style scoped lang="less"></style>
