@@ -1,5 +1,5 @@
 import $http from '../http.js';
-const suffix = '/goodsProduct';
+const suffix = '/goodsClassify';
 
 export default new (class {
   search(form) {
@@ -9,7 +9,7 @@ export default new (class {
   }
 
   doSearch(form) {
-    console.log("doSearch--", form);
+    console.log("doSearch form");
     return $http.get(`${suffix}/getByPage.do`, {
       params: form
     });
@@ -32,6 +32,7 @@ export default new (class {
   }
 
   deleteById(ids) { 
+    console.log("deleteById--", ids);
     return $http.get(`${suffix}/deleteById.do`, {
       params: {
         ids: ids,

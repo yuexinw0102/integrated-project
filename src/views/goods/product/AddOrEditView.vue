@@ -42,7 +42,9 @@
                 <el-option label="肉类" value="肉类"></el-option>
                 <el-option label="蛋类" value="蛋类"></el-option>
                 <el-option label="家禽类" value="家禽类"></el-option>
-                <el-option label="酒类" value="酒类"></el-option>
+                <el-option label="零食" value="零食"></el-option>
+                <el-option label="酒" value="酒类"></el-option>
+                <el-option label="饮品" value="饮品"></el-option>
                 <el-option label="矿泉水" value="矿泉水"></el-option>
                 <el-option label="食用油" value="食用油"></el-option>
                 <el-option label="调味品" value="调味品"></el-option>
@@ -50,6 +52,9 @@
                 <el-option label="手机" value="手机"></el-option>
                 <el-option label="大家电" value="大家电"></el-option>
                 <el-option label="服饰" value="服饰"></el-option>
+                <el-option label="化妆品" value="化妆品"></el-option>
+                <el-option label="纸巾" value="纸巾"></el-option>
+                <el-option label="百货" value="百货"></el-option>
               </el-select>
             </el-col> </el-form-item
         ></el-col>
@@ -57,7 +62,7 @@
           <el-form-item label="商品品种">
             <el-input
               size="small"
-              v-model="form.variety"
+              v-model="form.title"
             ></el-input> </el-form-item
         ></el-col>
       </el-row>
@@ -123,7 +128,7 @@
         <el-col>
           <el-form-item label="商品轮播">
             <el-upload
-              action="#"
+              action="http://localhost:3000/goodsProduct/add.do"
               list-type="picture-card"
               :auto-upload="false"
               :before-upload="beforeSlideShowUpload"
@@ -179,7 +184,11 @@
       <el-row>
         <el-col>
           <el-form-item label="详情页图">
-            <el-upload action="#" list-type="picture-card" :auto-upload="false">
+            <el-upload
+              action="/add.do"
+              list-type="picture-card"
+              :auto-upload="false"
+            >
               <i slot="default" class="el-icon-plus"></i>
               <div slot="file" slot-scope="{ file }">
                 <img
@@ -302,10 +311,14 @@
 
 <script>
   import product from "@/axios/goods/product";
+  import { mapMutations, mapState } from "vuex";
+  import { NAMES } from "@/store"; // 取出token
   // import slideShow from "@/axios/goods/productSlideShow";
   export default {
     name: "ProductAddOrEdit",
     created() {
+      console.log("headersObj", this.headersObj);
+      console.log("NAME.token", this[NAMES.token]);
       product
         .search()
         .then(({ data }) => {
@@ -374,6 +387,10 @@
           isGreenDiscounts: "", // 绿卡优惠
           greenPrice: "", // 绿卡价格
         },
+        // 存放token
+        headersObj: {
+          Authorization: sessionStorage.getItem("token"),
+        },
         // 存放商品轮播图
         goodsSlideShow: {
           // dialogImageUrl: "",
@@ -389,6 +406,9 @@
         loading: false,
         timer: null,
       };
+    },
+    computed: {
+      ...mapState([NAMES.token]),
     },
     methods: {
       handleSubmit(done) {
@@ -462,21 +482,23 @@
       // 转码处理函数
       beforeSlideShowUpload(file) {
         let _this = this;
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
           let reader = new FileReader();
           reader.readAsDataURL(file); // 转换成base64
           reader.onload = (event) => {
-            console.log('event', event);
+            console.log("event", event);
             _this.form.slideShowImgUrl.push(event.target.result); // 定义参数获取图片路径
-          }
-        })
+          };
+        });
       },
 
       //   上传商品轮播图相关方法
-      handleRemove(file) { // 移出图片
+      handleRemove(file) {
+        // 移出图片
         console.log(file);
       },
-      handlePictureCardPreview(file) { // 预览图片
+      handlePictureCardPreview(file) {
+        // 预览图片
         console.log(this.goodsSlideShow);
         console.log(file);
         this.form.slideShowImgUrl = file.url;
@@ -498,6 +520,7 @@
       handleDetailPageDownload(file) {
         console.log(file);
       },
+      ...mapMutations([NAMES.set_token]),
     },
   };
 </script>

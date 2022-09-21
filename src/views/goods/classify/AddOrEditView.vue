@@ -6,7 +6,7 @@
 
 <script>
     export default {
-        name: "AbsencesAddOrEdit",
+        name: "ClassifyAddOrEdit",
         data() {
             return {
                 

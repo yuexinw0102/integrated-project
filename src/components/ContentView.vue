@@ -1,7 +1,8 @@
 <template>
     <div class="col-md-9 col-sm-9 col-xs-9" style="flex: 1;margin: 0; padding: 0;">
         <div id="content_div" class="jumbotron">
-            <h3 class="text-left">{{menuTitle}}</h3>
+            <!-- 面包屑区域 -->
+            <slot name="breadcrumb"></slot>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <!-- 搜索框区域开始 -->

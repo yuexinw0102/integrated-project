@@ -5,7 +5,7 @@ const instance = axios.create({
     timeout: 15 * 1000
 })
 
-// 加上请求拦截器
+// 加上axios请求拦截器
 instance.interceptors.request.use(config => {
     config.headers['Authorization'] = sessionStorage.getItem("token");
     return config;

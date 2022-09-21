@@ -1,7 +1,7 @@
 <template>
   <div class="block">
     <el-pagination
-    background
+      background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page.sync="page.currentPage"
@@ -17,14 +17,14 @@
 <script>
   import bus from "@/eventBus/eventBus.js";
   export default {
-  name: "GoodsProductPagination",
-    props: ['total'], // total数据显示总数
+    name: "GoodsProductPagination",
+    props: ["total"], // total数据显示总数
     data() {
       return {
         page: {
           currentPage: 1, // 当前页码
           pageSize: 10,
-          pageTotal: 0,
+          pageTotal: this.total,
         },
       };
     },
@@ -39,13 +39,21 @@
       },
     },
     mounted() {
+      console.log("total", this.total);
       // 获取数据总数
       // bus.$on("tableTotal", (val) => {
       //   // console.log("分页组件接收tableTotal", val);
       //   this.page.pageTotal = val;
       // });
     },
-    
+    watch: {
+      total: {
+        handler(newValue, oldValue) {
+          this.total = newValue;
+          // console.log("total", newValue, oldValue);
+        },
+      },
+    },
   };
 </script>
 
