@@ -1,6 +1,4 @@
 const Mock = require("mockjs");
-// 获取 mock.Random 对象
-const Random = Mock.Random;
 let data = Mock.mock("/warehouse", {
   "data|200": [
     {

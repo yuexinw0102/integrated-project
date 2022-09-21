@@ -123,7 +123,6 @@ router.beforeEach((to, from, next) => {
     next();
   } else {
     const store = JSON.parse(sessionStorage.getItem("token"));
-    console.log(store);
     if (store === null || store === "" || store === undefined) {
       setTimeout(function () {
         next("/");

@@ -72,7 +72,6 @@
               @click="enable(scope.row.id)"
               >启用</el-button
             >
-            <button @click="rider">demo</button>
           </template>
         </el-table-column>
       </el-table>
@@ -102,11 +101,7 @@ export default {
     };
   },
   mounted() {
-    this.showData = this.tableData.filter((item) => {
-      console.log(
-        item.rider.map((item1) => item1.state == 1) == true
-      );
-    });
+    this.showData = this.tableData
     console.log();
     bus.$on("warehouse_num_change", (val) => {
       this.page.page_num = val;

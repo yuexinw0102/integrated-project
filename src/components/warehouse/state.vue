@@ -69,13 +69,15 @@
         <el-form-item label="关联小区" type="flex" justify="">
           <el-input
             placeholder="请输入小区名称"
-            v-model="form.search_community"
+            v-model="search.searchCommunity"
             style="width: 200px"
           ></el-input>
-          <el-button type="primary">查询</el-button>
-          <el-button type="primary">新增小区</el-button>
+          <el-button type="primary" @click="search('community')"
+            >查询</el-button
+          >
+          <el-button type="primary" @click="increase()">新增小区</el-button>
           <el-table
-            :data="form.community"
+            :data="search.communityData"
             style="width: 100%"
             border
             size="small"
@@ -85,7 +87,14 @@
             <el-table-column prop="address" label="小区地址" width="auto">
             </el-table-column>
             <el-table-column label="操作">
-              <el-button type="text" size="small">删除</el-button>
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="deleteCommunity(scope.$index)"
+                  >删除</el-button
+                >
+              </template>
             </el-table-column>
           </el-table>
         </el-form-item>
@@ -93,13 +102,13 @@
         <el-form-item label="配置骑手" type="flex" justify="">
           <el-input
             placeholder="请输入骑手名称"
-            v-model="form.search_community"
+            v-model="search.searchRider"
             style="width: 200px"
           ></el-input>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="search('rider')">查询</el-button>
           <el-button type="primary">新增骑手</el-button>
           <el-table
-            :data="form.rider"
+            :data="search.riderData"
             style="width: 100%"
             :row-class-name="state"
             border
@@ -133,13 +142,13 @@
         <el-form-item label="配置分拣员" type="flex" justify="">
           <el-input
             placeholder="请输入分拣员名称"
-            v-model="form.search_community"
+            v-model="search.searchSorting"
             style="width: 200px"
           ></el-input>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="search('sorting')">查询</el-button>
           <el-button type="primary">新增分拣员</el-button>
           <el-table
-            :data="form.sorting"
+            :data="search.sortingData"
             style="width: 100%"
             border
             size="small"
@@ -172,7 +181,7 @@
 
         <el-form-item>
           <el-button @click="back()">返回</el-button>
-          <el-button type="primary">保存资料</el-button>
+          <el-button type="primary" @click="save">保存资料</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -208,10 +217,16 @@ export default {
       showData: JSON.parse(localStorage.getItem("warehouseData")),
       area: "",
       city: "",
-      detailed_address: "",
-      search_community: "",
+      search: {
+        searchCommunity: "",
+        searchRider: "",
+        searchSorting: "",
+        communityData: [],
+        riderData: [],
+        sortingData: [],
+      },
       form: {
-        id:'',
+        id: "",
         name: "",
         area: "",
         city: "",
@@ -245,6 +260,33 @@ export default {
     back() {
       this.$router.push("/warehouse");
     },
+    save() {
+      this.showData.forEach((item) => {
+        if (item.id == this.form.id) {
+          item = this.form;
+        }
+      });
+      localStorage.setItem("warehouseData", JSON.stringify(this.showData));
+    },
+    search(dataName) {
+      if (dataName == "community") {
+        this.communityData = this.form[dataName].filter(
+          (item) => item.name == this.searchCommunity
+        );
+      } else if (dataName == "rider") {
+        this.riderData = this.form[dataName].filter(
+          (item) => item.name == this.searchRider
+        );
+      } else if (dataName == "sorting") {
+        this.sortingData = this.form[dataName].filter(
+          (item) => item.name == this.searchSorting
+        );
+      }
+    },
+    deleteCommunity(index) {
+      this.form.community.splice(index, 1);
+    },
+
     onSelected(data) {
       const { province, city, area } = data;
       if (!province.code && !city.code && !city.code) return;
@@ -313,6 +355,9 @@ export default {
         }
       }
     });
+    this.search.communityData = this.form.community;
+    this.search.riderData = this.form.rider;
+    this.search.sortingData = this.form.sorting;
   },
   components: {
     VDistpicker,

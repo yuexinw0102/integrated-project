@@ -90,9 +90,11 @@ export default {
             if (
               localStorage.getItem("warehouseData") == "" ||
               localStorage.getItem("warehouseData") == null ||
-              localStorage.getItem("warehouseData") == undefined
+              localStorage.getItem("warehouseData") == undefined ||
+              localStorage.getItem("warehouseData") == []
             ) {
               axios.get("/warehouse").then((res) => {
+                console.log(res.data.data);
                 localStorage.setItem(
                   "warehouseData",
                   JSON.stringify(res.data.data)
