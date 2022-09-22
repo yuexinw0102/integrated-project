@@ -4,7 +4,7 @@
       <span>仓库管理 > {{ $store.state.warehouseEditor }}</span>
     </div>
     <div class="text item">
-      <el-form ref="form" :model="form" label-width="auto">
+      <el-form ref="form" :rules="rules" :model="form" label-width="auto">
         <el-form-item label="仓库名称" prop="name">
           <el-input v-model="form.name" placeholder="仓库名称"></el-input>
         </el-form-item>
@@ -62,7 +62,10 @@
         </el-form-item>
 
         <el-form-item label="仓库面积" prop="acreage">
-          <el-input placeholder="仓库面积" v-model.number="form.acreage"></el-input>
+          <el-input
+            placeholder="仓库面积"
+            v-model.number="form.acreage"
+          ></el-input>
         </el-form-item>
 
         <el-form-item label="关联小区" type="flex" justify="">
@@ -79,7 +82,11 @@
           >
 
           <el-dialog title="新增小区" :visible.sync="dialogFormVisible">
-            <el-form :model="increaseData" ref="increaseData">
+            <el-form
+              :model="increaseData"
+              ref="increaseData"
+              :rules="communityRules"
+            >
               <el-form-item label="请输入名称" prop="name">
                 <el-input
                   v-model="increaseData.name"
@@ -98,6 +105,7 @@
               <el-button
                 type="primary"
                 @click="increase('community', 'increaseData')"
+                @change="validation('increaseData')"
                 >确 定</el-button
               >
             </div>
@@ -136,7 +144,11 @@
             >新增骑手</el-button
           >
           <el-dialog title="新增骑手" :visible.sync="dialogFormVisible1">
-            <el-form :model="increaseData" ref="increaseData">
+            <el-form
+              :model="increaseData"
+              ref="increaseData"
+              :rules="riderRules"
+            >
               <el-form-item label="请输入姓名">
                 <el-input
                   v-model="increaseData.name"
@@ -151,7 +163,7 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogFormVisible = false">取 消</el-button>
+              <el-button @click="dialogFormVisible1 = false">取 消</el-button>
               <el-button
                 type="primary"
                 @click="increase('rider', 'increaseData')"
@@ -202,7 +214,11 @@
             >新增分拣员</el-button
           >
           <el-dialog title="新增分拣员" :visible.sync="dialogFormVisible2">
-            <el-form :model="increaseData" ref="increaseData">
+            <el-form
+              :model="increaseData"
+              ref="increaseData"
+              :rules="sortingRules"
+            >
               <el-form-item label="请输入姓名" prop="name">
                 <el-input
                   v-model="increaseData.name"
@@ -217,10 +233,11 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogFormVisible = false">取 消</el-button>
+              <el-button @click="dialogFormVisible2 = false">取 消</el-button>
               <el-button
                 type="primary"
                 @click="increase('sorting', 'increaseData')"
+                @change="validation('increaseData')"
                 >确 定</el-button
               >
             </div>
@@ -259,7 +276,7 @@
 
         <el-form-item>
           <el-button @click="back()">返回</el-button>
-          <el-button type="primary" @click="save">保存资料</el-button>
+          <el-button type="primary" @click="save('form')">保存资料</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -309,9 +326,28 @@ export default {
         area: "",
         city: "",
         acreage: "",
+        detailed_address: "",
         community: [],
         rider: [],
         sorting: [],
+      },
+      rules: {
+        name: [
+          { required: true, message: "请输入仓库名称", trigger: "blur" },
+          {
+            min: 3,
+            max: 15,
+            message: "长度在 3 到 15 个字符",
+            trigger: "blur",
+          },
+        ],
+        acreage: [
+          { required: true, message: "请输入仓库面积", trigger: "blur" },
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+        ],
+        detailed_address: [
+          { required: true, message: "请输入仓库地址", trigger: "blur" },
+        ],
       },
       selected: {
         province: "",
@@ -345,26 +381,36 @@ export default {
     back() {
       this.$router.push("/warehouse");
     },
-    save() {
-      if (this.form.id !== "") {
-        this.showData.forEach((item) => {
-          if (item.id == this.form.id) {
-            item = this.form;
+    save(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.form.id !== "") {
+            this.showData.forEach((item) => {
+              if (item.id == this.form.id) {
+                item = this.form;
+              }
+            });
+            localStorage.setItem(
+              "warehouseData",
+              JSON.stringify(this.showData)
+            );
+          } else if (this.form.id == "") {
+            let max = [];
+            this.form.area = this.selected.area;
+            this.form.city = this.selected.city;
+            this.showData.forEach((item) => {
+              max.push(item.id);
+            });
+            let arr = Math.max(...max);
+            this.form.id = arr + 1;
+            this.showData.push(this.form);
+            localStorage.setItem(
+              "warehouseData",
+              JSON.stringify(this.showData)
+            );
           }
-        });
-        localStorage.setItem("warehouseData", JSON.stringify(this.showData));
-      } else if (this.form.id == "") {
-        let max = [];
-        this.form.area = this.selected.area;
-        this.form.city = this.selected.city;
-        this.showData.forEach((item) => {
-          max.push(item.id);
-        });
-        let arr = Math.max(...max);
-        this.form.id = arr + 1;
-        this.showData.push(this.form);
-        localStorage.setItem("warehouseData", JSON.stringify(this.showData));
-      }
+        }
+      });
     },
     search(dataName) {
       if (dataName == "community") {
@@ -384,7 +430,13 @@ export default {
     deleteCommunity(index) {
       this.form.community.splice(index, 1);
     },
+    validation() {
+      this.$refs[formName].validate();
+    },
     increase(dataName, formName) {
+      if (this.increaseData.name !== "" || this.increaseData.value !== "") {
+        this.$refs[formName].resetFields();
+      }
       if (dataName == "community") {
         this.dialogFormVisible = false;
         this.form.community.push({
@@ -405,9 +457,6 @@ export default {
           phone: this.increaseData.value,
           state: 1,
         });
-      }
-      if (this.increaseData.name !== "" || this.increaseData.value !== "") {
-        this.$refs[formName].resetFields();
       }
     },
     onSelected(data) {
