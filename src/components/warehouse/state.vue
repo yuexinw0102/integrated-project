@@ -5,9 +5,11 @@
     </div>
     <div class="text item">
       <el-form ref="form" :rules="rules" :model="form" label-width="auto">
+        <!-- 仓库名称 -->
         <el-form-item label="仓库名称" prop="name">
           <el-input v-model="form.name" placeholder="仓库名称"></el-input>
         </el-form-item>
+        <!-- 所在城市和区域 -->
         <el-form-item v-if="this.dataId == ''" label="所在城市">
           <v-distpicker @selected="onSelected"></v-distpicker>
         </el-form-item>
@@ -52,7 +54,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-
+        <!-- 仓库地址 -->
         <el-form-item label="仓库地址" prop="detailed_address">
           <el-input
             placeholder="仓库地址"
@@ -60,14 +62,14 @@
             v-model="form.detailed_address"
           ></el-input>
         </el-form-item>
-
+        <!-- 仓库面积 -->
         <el-form-item label="仓库面积" prop="acreage">
           <el-input
             placeholder="仓库面积"
             v-model.number="form.acreage"
           ></el-input>
         </el-form-item>
-
+        <!-- 小区 -->
         <el-form-item label="关联小区" type="flex" justify="">
           <el-input
             placeholder="请输入小区名称"
@@ -80,13 +82,9 @@
           <el-button type="primary" @click="dialogFormVisible = true"
             >新增小区</el-button
           >
-
+          <!-- 小区新增 -->
           <el-dialog title="新增小区" :visible.sync="dialogFormVisible">
-            <el-form
-              :model="increaseData"
-              ref="increaseData"
-              :rules="communityRules"
-            >
+            <el-form :model="increaseData" ref="increaseData">
               <el-form-item label="请输入名称" prop="name">
                 <el-input
                   v-model="increaseData.name"
@@ -105,11 +103,11 @@
               <el-button
                 type="primary"
                 @click="increase('community', 'increaseData')"
-                @change="validation('increaseData')"
                 >确 定</el-button
               >
             </div>
           </el-dialog>
+          <!-- 小区内容显示表格 -->
           <el-table
             :data="searchData.communityData"
             style="width: 100%"
@@ -132,7 +130,7 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-
+        <!-- 骑手 -->
         <el-form-item label="配置骑手" type="flex" justify="">
           <el-input
             placeholder="请输入骑手名称"
@@ -143,12 +141,9 @@
           <el-button type="primary" @click="dialogFormVisible1 = true"
             >新增骑手</el-button
           >
+          <!-- 骑手新增 -->
           <el-dialog title="新增骑手" :visible.sync="dialogFormVisible1">
-            <el-form
-              :model="increaseData"
-              ref="increaseData"
-              :rules="riderRules"
-            >
+            <el-form :model="increaseData" ref="increaseData">
               <el-form-item label="请输入姓名">
                 <el-input
                   v-model="increaseData.name"
@@ -171,6 +166,7 @@
               >
             </div>
           </el-dialog>
+          <!-- 骑手数据显示区域 -->
           <el-table
             :data="searchData.riderData"
             style="width: 100%"
@@ -202,7 +198,7 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-
+        <!-- 分拣员 -->
         <el-form-item label="配置分拣员" type="flex" justify="">
           <el-input
             placeholder="请输入分拣员名称"
@@ -213,12 +209,9 @@
           <el-button type="primary" @click="dialogFormVisible2 = true"
             >新增分拣员</el-button
           >
+          <!-- 分拣员新增 -->
           <el-dialog title="新增分拣员" :visible.sync="dialogFormVisible2">
-            <el-form
-              :model="increaseData"
-              ref="increaseData"
-              :rules="sortingRules"
-            >
+            <el-form :model="increaseData" ref="increaseData">
               <el-form-item label="请输入姓名" prop="name">
                 <el-input
                   v-model="increaseData.name"
@@ -242,6 +235,7 @@
               >
             </div>
           </el-dialog>
+          <!-- 分拣员数据显示区域 -->
           <el-table
             :data="searchData.sortingData"
             style="width: 100%"
@@ -273,7 +267,7 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-
+        <!-- 操作 -->
         <el-form-item>
           <el-button @click="back()">返回</el-button>
           <el-button type="primary" @click="save('form')">保存资料</el-button>
@@ -323,13 +317,14 @@ export default {
       form: {
         id: "",
         name: "",
-        area: "",
-        city: "",
+        area: {},
+        city: {},
         acreage: "",
         detailed_address: "",
         community: [],
         rider: [],
         sorting: [],
+        state:1
       },
       rules: {
         name: [
@@ -343,7 +338,6 @@ export default {
         ],
         acreage: [
           { required: true, message: "请输入仓库面积", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
         detailed_address: [
           { required: true, message: "请输入仓库地址", trigger: "blur" },
@@ -396,13 +390,14 @@ export default {
             );
           } else if (this.form.id == "") {
             let max = [];
-            this.form.area = this.selected.area;
-            this.form.city = this.selected.city;
+            ;
             this.showData.forEach((item) => {
               max.push(item.id);
             });
             let arr = Math.max(...max);
             this.form.id = arr + 1;
+            this.form.area = {key:this.form.id,val:this.selected.area}
+            this.form.city = {key:this.form.id,val:this.selected.city}
             this.showData.push(this.form);
             localStorage.setItem(
               "warehouseData",
@@ -434,9 +429,6 @@ export default {
       this.$refs[formName].validate();
     },
     increase(dataName, formName) {
-      if (this.increaseData.name !== "" || this.increaseData.value !== "") {
-        this.$refs[formName].resetFields();
-      }
       if (dataName == "community") {
         this.dialogFormVisible = false;
         this.form.community.push({
@@ -457,6 +449,9 @@ export default {
           phone: this.increaseData.value,
           state: 1,
         });
+      }
+      if (this.increaseData.name !== "" || this.increaseData.value !== "") {
+        this.$refs[formName].resetFields();
       }
     },
     onSelected(data) {
