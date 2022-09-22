@@ -1,13 +1,18 @@
 <template>
   <ContentView>
-    <template #search_form>
+    <template #searchForm>
       <span>仓库管理</span>
+
       <Search_box style="height:auto"></Search_box>
+
     </template>
-    <template #data_table>
+    <template #dataFable>
+
       <Table_area style="margin-bottom:5px;"></Table_area>
     </template>
+
     <template v-slot:pagination>
+      
       <Pagination></Pagination>
     </template>
   </ContentView>
