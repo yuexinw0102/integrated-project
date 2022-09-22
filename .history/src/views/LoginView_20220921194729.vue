@@ -87,6 +87,7 @@ export default {
           if (data.code == 200) {
             this.$store.commit("set_token", data);
             const token = data.tokenHeader + data.token;
+            // console.log("token: ", token);
             sessionStorage.setItem("token", token); // 存入token
             this[NAMES.set_token](data);
             this.$router.replace("/home");
@@ -105,6 +106,7 @@ export default {
           }
         }
       });
+      // this.$router.replace("/home");
     },
     ...mapMutations([NAMES.set_token]),
   },

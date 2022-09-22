@@ -39,6 +39,7 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import axios from "axios";
 import $http from "../axios/login.js";
 import { mapMutations } from "vuex";
@@ -83,25 +84,16 @@ export default {
       this.$refs["loginForm"].validate(async (valid) => {
         if (valid) {
           const { data } = await $http.login(this.form);
-          console.log("data: ", data);
           if (data.code == 200) {
-            this.$store.commit("set_token", data);
-            const token = data.tokenHeader + data.token;
-            sessionStorage.setItem("token", token); // 存入token
             this[NAMES.set_token](data);
             this.$router.replace("/home");
-            if (
-              localStorage.getItem("warehouseData") == "" ||
-              localStorage.getItem("warehouseData") == null ||
-              localStorage.getItem("warehouseData") == undefined
-            ) {
+            if (localStorage.getItem("warehouseData") == "") {
               axios.get("/warehouse").then((res) => {
-                localStorage.setItem(
-                  "warehouseData",
-                  JSON.stringify(res.data.data)
-                );
+                localStorage.setItem("warehouseData", JSON.stringify(res.data.data));
               });
-            }
+            }else{
+				localStorage.setItem("warehouseData",'');
+			}
           }
         }
       });
@@ -109,6 +101,55 @@ export default {
     ...mapMutations([NAMES.set_token]),
   },
 };
+=======
+	import $http from "../axios/login.js";
+	import { mapMutations } from "vuex";
+	import { NAMES } from "@/store";
+	export default {
+		name: "Login",
+		data() {
+			return {
+				form: {
+					account: "admin",
+					password: "123456",
+				},
+				isLoading: false,
+				rules: {
+					account: [
+						{ required: true, message: '请输入账户', trigger: 'blur' },
+						{ min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' }
+					],
+					password: [
+						{ required: true, message: '请输入密码', trigger: 'blur' },
+						{ min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' }
+					],
+				}
+			};
+		},
+		methods: {
+			handler_login() {
+				this.isLoading = true;
+				setTimeout(() => {
+					this.isLoading = false;
+				}, 2000);
+				this.$refs["loginForm"].validate(async (valid) => {
+					if (valid) {
+						const { data } = await $http.login(this.form);
+						if (data.status == "success") {
+							// this.$store.commit("set_token", data)
+							const token = data.tokenHeader + data.token;
+							sessionStorage.setItem('token', token); // 存入token
+							this[NAMES.set_token](data);
+							this.$router.replace("/home");
+						}
+					}
+				})
+				// this.$router.replace("/home");
+			},
+			...mapMutations([NAMES.set_token]),
+		},
+	};
+>>>>>>> origin/feature-product
 </script>
 
 <style lang="less" scoped>

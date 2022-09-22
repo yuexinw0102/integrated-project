@@ -86,8 +86,8 @@ export default {
           console.log("data: ", data);
           if (data.code == 200) {
             this.$store.commit("set_token", data);
-            const token = data.tokenHeader + data.token;
-            sessionStorage.setItem("token", token); // 存入token
+            // const token = data.tokenHeader + data.token;
+            // sessionStorage.setItem("token", token); // 存入token
             this[NAMES.set_token](data);
             this.$router.replace("/home");
             if (

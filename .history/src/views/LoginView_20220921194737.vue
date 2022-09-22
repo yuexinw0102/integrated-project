@@ -105,6 +105,7 @@ export default {
           }
         }
       });
+      // this.$router.replace("/home");
     },
     ...mapMutations([NAMES.set_token]),
   },
