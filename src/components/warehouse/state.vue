@@ -62,7 +62,7 @@
         </el-form-item>
 
         <el-form-item label="仓库面积" prop="acreage">
-          <el-input placeholder="仓库面积" v-model="form.acreage"></el-input>
+          <el-input placeholder="仓库面积" v-model.number="form.acreage"></el-input>
         </el-form-item>
 
         <el-form-item label="关联小区" type="flex" justify="">
@@ -95,7 +95,9 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="increase('community','increaseData')"
+              <el-button
+                type="primary"
+                @click="increase('community', 'increaseData')"
                 >确 定</el-button
               >
             </div>
@@ -143,14 +145,16 @@
               </el-form-item>
               <el-form-item label="请输入电话">
                 <el-input
-                  v-model="increaseData.value"
+                  v-model.number="increaseData.value"
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="increase('rider','increaseData')"
+              <el-button
+                type="primary"
+                @click="increase('rider', 'increaseData')"
                 >确 定</el-button
               >
             </div>
@@ -207,14 +211,16 @@
               </el-form-item>
               <el-form-item label="请输入电话" prop="value">
                 <el-input
-                  v-model="increaseData.value"
+                  v-model.number="increaseData.value"
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="increase('sorting','increaseData')"
+              <el-button
+                type="primary"
+                @click="increase('sorting', 'increaseData')"
                 >确 定</el-button
               >
             </div>
@@ -340,12 +346,25 @@ export default {
       this.$router.push("/warehouse");
     },
     save() {
-      this.showData.forEach((item) => {
-        if (item.id == this.form.id) {
-          item = this.form;
-        }
-      });
-      localStorage.setItem("warehouseData", JSON.stringify(this.showData));
+      if (this.form.id !== "") {
+        this.showData.forEach((item) => {
+          if (item.id == this.form.id) {
+            item = this.form;
+          }
+        });
+        localStorage.setItem("warehouseData", JSON.stringify(this.showData));
+      } else if (this.form.id == "") {
+        let max = [];
+        this.form.area = this.selected.area;
+        this.form.city = this.selected.city;
+        this.showData.forEach((item) => {
+          max.push(item.id);
+        });
+        let arr = Math.max(...max);
+        this.form.id = arr + 1;
+        this.showData.push(this.form);
+        localStorage.setItem("warehouseData", JSON.stringify(this.showData));
+      }
     },
     search(dataName) {
       if (dataName == "community") {
@@ -365,22 +384,31 @@ export default {
     deleteCommunity(index) {
       this.form.community.splice(index, 1);
     },
-    increase(dataName,formName) {
+    increase(dataName, formName) {
       if (dataName == "community") {
         this.dialogFormVisible = false;
-        this.form.community.push({name:this.increaseData.name,address:this.increaseData.value});
+        this.form.community.push({
+          name: this.increaseData.name,
+          address: this.increaseData.value,
+        });
       } else if (dataName == "rider") {
         this.dialogFormVisible1 = false;
-        this.riderData = this.form[dataName].filter(
-          (item) => item.name == this.searchRider
-        );
+        this.form.rider.push({
+          name: this.increaseData.name,
+          phone: this.increaseData.value,
+          state: 1,
+        });
       } else if (dataName == "sorting") {
         this.dialogFormVisible2 = false;
-        this.sortingData = this.form[dataName].filter(
-          (item) => item.name == this.searchSorting
-        );
+        this.form.sorting.push({
+          name: this.increaseData.name,
+          phone: this.increaseData.value,
+          state: 1,
+        });
       }
-      this.$refs[formName].resetFields();
+      if (this.increaseData.name !== "" || this.increaseData.value !== "") {
+        this.$refs[formName].resetFields();
+      }
     },
     onSelected(data) {
       const { province, city, area } = data;
