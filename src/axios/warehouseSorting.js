@@ -1,5 +1,5 @@
 import $http from "./http.js";
-const suffix = "/warehouse";
+const suffix = "/warehouseSortingRouter";
 
 export default new (class {
   search(form) {
@@ -32,6 +32,12 @@ export default new (class {
     });
   }
 
+  getById(id) {
+    return $http.get(`${suffix}/getById.do`, {
+      params: { id: id },
+    });
+  }
+
   edit(form) {
     return $http.post(`${suffix}/edit.do`, form);
   }
@@ -41,4 +47,12 @@ export default new (class {
     return $http.post(`${suffix}/add.do`, form);
   }
 
+  deleteById(ids) {
+    console.log("deleteById--", ids);
+    return $http.get(`${suffix}/deleteById.do`, {
+      params: {
+        ids: ids,
+      },
+    });
+  }
 })();

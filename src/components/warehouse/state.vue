@@ -1,7 +1,7 @@
 <template>
   <el-card class="box-card">
     <div slot="header" class="clearfix">
-      <span>仓库管理 > {{ $store.state.warehouseEditor }}</span>
+      <span>仓库管理 > {{ warehouseEditor }}</span>
     </div>
     <div class="text item">
       <el-form ref="form" :rules="rules" :model="form" label-width="auto">
@@ -10,56 +10,21 @@
           <el-input v-model="form.name" placeholder="仓库名称"></el-input>
         </el-form-item>
         <!-- 所在城市和区域 -->
-        <el-form-item v-if="this.dataId == ''" label="所在城市">
-          <v-distpicker @selected="onSelected"></v-distpicker>
+        <el-form-item label="所在城市">
+          <v-distpicker
+            :province="form.province"
+            :city="form.city"
+            :area="form.area"
+            style="width: 100%"
+            @selected="onSelected"
+          ></v-distpicker>
         </el-form-item>
-        <el-row v-else type="flex" justify="">
-          <el-col :span="11">
-            <el-form-item prop="city" label="所在城市">
-              <el-select
-                v-model="form.city"
-                placeholder="所在城市"
-                size="small"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="(item, index) in city"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.label"
-                >
-                  <span style="float: left">{{ item.label }}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="2"></el-col>
-          <el-col :span="11">
-            <el-form-item prop="area" label="所在城市">
-              <el-select
-                v-model="form.area"
-                placeholder="所在区域"
-                size="small"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="(item, index) in area"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.label"
-                >
-                  <span style="float: left">{{ item.label }}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <!-- 仓库地址 -->
-        <el-form-item label="仓库地址" prop="detailed_address">
+        <el-form-item label="仓库地址" prop="detailedAddress">
           <el-input
             placeholder="仓库地址"
             type="textarea"
-            v-model="form.detailed_address"
+            v-model="form.detailedAddress"
           ></el-input>
         </el-form-item>
         <!-- 仓库面积 -->
@@ -116,14 +81,14 @@
           >
             <el-table-column prop="name" label="小区名称" width="auto">
             </el-table-column>
-            <el-table-column prop="address" label="小区地址" width="auto">
+            <el-table-column prop="value" label="小区地址" width="auto">
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button
                   type="text"
                   size="small"
-                  @click="deleteCommunity(scope.$index)"
+                  @click="deleteCommunity(scope.row.id)"
                   >删除</el-button
                 >
               </template>
@@ -143,16 +108,16 @@
           >
           <!-- 骑手新增 -->
           <el-dialog title="新增骑手" :visible.sync="dialogFormVisible1">
-            <el-form :model="increaseData" ref="increaseData">
-              <el-form-item label="请输入姓名">
+            <el-form :model="personnelData" ref="personnelData">
+              <el-form-item label="请输入姓名" prop="name">
                 <el-input
-                  v-model="increaseData.name"
+                  v-model="personnelData.name"
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
-              <el-form-item label="请输入电话">
+              <el-form-item label="请输入电话" prop="phone">
                 <el-input
-                  v-model.number="increaseData.value"
+                  v-model.number="personnelData.phone"
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
@@ -161,7 +126,7 @@
               <el-button @click="dialogFormVisible1 = false">取 消</el-button>
               <el-button
                 type="primary"
-                @click="increase('rider', 'increaseData')"
+                @click="increase('rider', 'personnelData')"
                 >确 定</el-button
               >
             </div>
@@ -184,14 +149,14 @@
                   v-if="scope.row.state == 1"
                   type="text"
                   size="small"
-                  @click="disable(scope.row.name, 1)"
+                  @click="disable(scope.row.id, 1)"
                   >停用</el-button
                 >
                 <el-button
                   v-else
                   type="text"
                   size="small"
-                  @click="enable(scope.row.name, 1)"
+                  @click="enable(scope.row.id, 1)"
                   >启用</el-button
                 >
               </template>
@@ -211,16 +176,16 @@
           >
           <!-- 分拣员新增 -->
           <el-dialog title="新增分拣员" :visible.sync="dialogFormVisible2">
-            <el-form :model="increaseData" ref="increaseData">
+            <el-form :model="personnelData" ref="personnelData">
               <el-form-item label="请输入姓名" prop="name">
                 <el-input
-                  v-model="increaseData.name"
+                  v-model="personnelData.name"
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
-              <el-form-item label="请输入电话" prop="value">
+              <el-form-item label="请输入电话" prop="phone">
                 <el-input
-                  v-model.number="increaseData.value"
+                  v-model.number="personnelData.phone"
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
@@ -229,8 +194,7 @@
               <el-button @click="dialogFormVisible2 = false">取 消</el-button>
               <el-button
                 type="primary"
-                @click="increase('sorting', 'increaseData')"
-                @change="validation('increaseData')"
+                @click="increase('sorting', 'personnelData')"
                 >确 定</el-button
               >
             </div>
@@ -253,14 +217,14 @@
                   v-if="scope.row.state == 1"
                   type="text"
                   size="small"
-                  @click="disable(scope.row.name, 2)"
+                  @click="disable(scope.row.id, 2)"
                   >停用</el-button
                 >
                 <el-button
                   v-else
                   type="text"
                   size="small"
-                  @click="enable(scope.row.name, 2)"
+                  @click="enable(scope.row.id, 2)"
                   >启用</el-button
                 >
               </template>
@@ -298,14 +262,20 @@
 </style>
 <script>
 import VDistpicker from "v-distpicker";
-import { mapState } from "vuex";
+import warehouse from "@/axios/warehouse";
+import warehouseRider from "@/axios/warehouseRider";
+import warehouseSorting from "@/axios/warehouseSorting";
+import warehouseCommunity from "@/axios/warehouseCommunity";
 export default {
   name: "AbsencesAddOrEdit",
   data() {
     return {
-      showData: JSON.parse(localStorage.getItem("warehouseData")),
-      area: "",
-      city: "",
+      dataId: this.$route.query.id,
+      warehouseEditor: "",
+      showData: [],
+      communityData: [],
+      riderData: [],
+      sortingData: [],
       searchData: {
         searchCommunity: "",
         searchRider: "",
@@ -317,14 +287,12 @@ export default {
       form: {
         id: "",
         name: "",
-        area: {},
-        city: {},
+        province: "",
+        area: "",
+        city: "",
         acreage: "",
-        detailed_address: "",
-        community: [],
-        rider: [],
-        sorting: [],
-        state:1
+        detailedAddress: "",
+        state: 1,
       },
       rules: {
         name: [
@@ -339,18 +307,22 @@ export default {
         acreage: [
           { required: true, message: "请输入仓库面积", trigger: "blur" },
         ],
-        detailed_address: [
+        detailedAddress: [
           { required: true, message: "请输入仓库地址", trigger: "blur" },
         ],
       },
-      selected: {
-        province: "",
-        city: "",
-        area: "",
-      },
       increaseData: {
+        id: "",
         name: "",
         value: "",
+        warehouseId: "",
+      },
+      personnelData: {
+        id: "",
+        name: "",
+        phone: "",
+        warehouseId: "",
+        state: 1,
       },
       dialogFormVisible: false,
       dialogFormVisible1: false,
@@ -358,9 +330,6 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      dataId: "warehouseDataId",
-    }),
     fullAddress: function () {
       return (
         this.selected.province +
@@ -371,38 +340,80 @@ export default {
       );
     },
   },
+  created() {
+    //数据获取
+    warehouse.search().then(({ data }) => {
+      if (data.status == "success") {
+        this.showData = data.data;
+        this.handlerGetBox();
+      }
+    });
+    warehouseCommunity.search().then(({ data }) => {
+      if (data.status == "success") {
+        this.communityData = data.data;
+        this.communityData.forEach((item) => {
+          if (item.warehouseId == this.dataId) {
+            this.searchData.communityData.push(item);
+          }
+        });
+      }
+    });
+    warehouseRider.search().then(({ data }) => {
+      if (data.status == "success") {
+        this.riderData = data.data;
+        this.riderData.forEach((item) => {
+          if (item.warehouseId == this.dataId) {
+            this.searchData.riderData.push(item);
+          }
+        });
+      }
+    });
+    warehouseSorting.search().then(({ data }) => {
+      if (data.status == "success") {
+        this.sortingData = data.data;
+        this.sortingData.forEach((item) => {
+          if (item.warehouseId == this.dataId) {
+            this.searchData.sortingData.push(item);
+          }
+        });
+      }
+    });
+
+    //面包屑内容
+    if (this.dataId == undefined) {
+      this.warehouseEditor = "新增仓库";
+    } else {
+      this.warehouseEditor = "仓库详情";
+    }
+  },
+  mounted() {},
   methods: {
     back() {
       this.$router.push("/warehouse");
+    },
+    //所在城市和区域下拉框数据获取与去重
+    handlerGetBox() {
+      this.showData.forEach((item, index) => {
+        if (item.id == this.dataId) {
+          this.form = item;
+        }
+      });
     },
     save(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.form.id !== "") {
-            this.showData.forEach((item) => {
-              if (item.id == this.form.id) {
-                item = this.form;
-              }
-            });
-            localStorage.setItem(
-              "warehouseData",
-              JSON.stringify(this.showData)
-            );
+            //修改
+            warehouse.edit(this.form);
           } else if (this.form.id == "") {
+            //增加
             let max = [];
-            ;
             this.showData.forEach((item) => {
               max.push(item.id);
             });
             let arr = Math.max(...max);
             this.form.id = arr + 1;
-            this.form.area = {key:this.form.id,val:this.selected.area}
-            this.form.city = {key:this.form.id,val:this.selected.city}
-            this.showData.push(this.form);
-            localStorage.setItem(
-              "warehouseData",
-              JSON.stringify(this.showData)
-            );
+            warehouse.add(this.form);
           }
         }
       });
@@ -422,110 +433,111 @@ export default {
         );
       }
     },
+
+    //小区删除
     deleteCommunity(index) {
-      this.form.community.splice(index, 1);
+      warehouseCommunity.deleteById(index);
     },
-    validation() {
-      this.$refs[formName].validate();
-    },
+
+    //增加
     increase(dataName, formName) {
       if (dataName == "community") {
-        this.dialogFormVisible = false;
-        this.form.community.push({
-          name: this.increaseData.name,
-          address: this.increaseData.value,
-        });
+        if (this.increaseData.name !== "" && this.increaseData.value !== "") {
+          this.dialogFormVisible = false;
+          let max = [];
+          this.communityData.forEach((item) => {
+            max.push(item.id);
+          });
+          let arr = Math.max(...max);
+          this.increaseData.id = arr + 1;
+          this.increaseData.warehouseId = this.dataId;
+          warehouseCommunity.add(this.increaseData);
+        } else {
+          this.$message.error("请输入内容");
+        }
       } else if (dataName == "rider") {
-        this.dialogFormVisible1 = false;
-        this.form.rider.push({
-          name: this.increaseData.name,
-          phone: this.increaseData.value,
-          state: 1,
-        });
+        if (this.personnelData.name !== "" && this.personnelData.phone !== "") {
+          this.dialogFormVisible1 = false;
+          let max = [];
+          this.riderData.forEach((item) => {
+            max.push(item.id);
+          });
+          let arr = Math.max(...max);
+          this.personnelData.id = arr + 1;
+          this.personnelData.warehouseId = this.dataId;
+          warehouseRider.add(this.personnelData);
+        } else {
+          this.$message.error("请输入内容");
+        }
       } else if (dataName == "sorting") {
-        this.dialogFormVisible2 = false;
-        this.form.sorting.push({
-          name: this.increaseData.name,
-          phone: this.increaseData.value,
-          state: 1,
-        });
+        if (this.personnelData.name !== "" && this.personnelData.phone !== "") {
+          this.dialogFormVisible2 = false;
+          let max = [];
+          this.sortingData.forEach((item) => {
+            max.push(item.id);
+          });
+          let arr = Math.max(...max);
+          this.personnelData.id = arr + 1;
+          this.personnelData.warehouseId = this.dataId;
+          warehouseSorting.add(this.personnelData);
+        } else {
+          this.$message.error("请输入内容");
+        }
       }
-      if (this.increaseData.name !== "" || this.increaseData.value !== "") {
-        this.$refs[formName].resetFields();
-      }
+      this.$refs[formName].resetFields();
     },
+
+    //城市三级联动插件
     onSelected(data) {
       const { province, city, area } = data;
       if (!province.code && !city.code && !city.code) return;
-      this.selected.province = province.value;
-      this.selected.city = city.value;
-      this.selected.area = area.value;
+      this.form.province = province.value;
+      this.form.city = city.value;
+      this.form.area = area.value;
     },
+
+    //停用与启用
     state({ row, rowIndex }) {
       if (row.state === 0) {
         return "warning-row";
-      } else {
-        return "";
       }
     },
-    disable(name, dataName) {
+    disable(id, dataName) {
       if (dataName == 1) {
-        this.form.rider.forEach((item1) => {
-          if (item1.name === name) {
-            item1.state = 0;
+        this.searchData.riderData.forEach((item) => {
+          if (item.id === id) {
+            item.state = 0;
+            warehouseRider.edit({ state: `${item.state}`, id: item.id });
           }
         });
       } else {
-        this.form.sorting.forEach((item1) => {
-          if (item1.name === name) {
-            item1.state = 0;
+        this.searchData.sortingData.forEach((item) => {
+          if (item.id === id) {
+            item.state = 0;
+            warehouseSorting.edit({ state: `${item.state}`, id: item.id });
           }
         });
       }
     },
-    enable(name, dataName) {
+    enable(id, dataName) {
       if (dataName == 1) {
-        this.form.rider.forEach((item1) => {
-          if (item1.name === name) {
-            item1.state = 1;
+        this.searchData.riderData.forEach((item) => {
+          if (item.id === id) {
+            item.state = 1;
+            warehouseRider.edit({ state: `${item.state}`, id: item.id });
           }
         });
       } else {
-        this.form.sorting.forEach((item1) => {
-          if (item1.name === name) {
-            item1.state = 1;
+        this.searchData.sortingData.forEach((item) => {
+          if (item.id === id) {
+            item.state = 1;
+            warehouseSorting.edit({ state: `${item.state}`, id: item.id });
           }
         });
       }
     },
   },
-  created() {
-    let city = [];
-    let area = [];
-    this.showData.forEach((item) => {
-      city.push({ label: item.city.val, disabled: false });
-      area.push({ label: item.area.val, disabled: false });
-    });
-    let obj = {};
-    this.city = city.reduce(function (item, next) {
-      obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
-      return item;
-    }, []);
-    this.area = area.reduce(function (item, next) {
-      obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
-      return item;
-    }, []);
-    this.showData.forEach((item) => {
-      if (this.dataId !== "") {
-        if (item.id == this.dataId) {
-          return (this.form = item);
-        }
-      }
-    });
-    this.searchData.communityData = this.form.community;
-    this.searchData.riderData = this.form.rider;
-    this.searchData.sortingData = this.form.sorting;
-  },
+
   components: {
     VDistpicker,
   },

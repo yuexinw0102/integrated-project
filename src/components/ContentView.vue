@@ -3,14 +3,14 @@
         <div id="content_div" class="jumbotron">
             <h3 class="text-left">{{menuTitle}}</h3>
             <div class="panel panel-default">
-                <div class="panel-heading">
+                <div class="panelHeading">
                     <!-- 搜索框区域开始 -->
-                    <slot name="search_form"></slot>
+                    <slot name="searchForm"></slot>
                     <!-- 搜索框区域结束 -->
                 </div>
                 <div class="panel-body">
                     <!-- 表格区域开始 -->
-                    <slot name="data_table"></slot>
+                    <slot name="dataTable"></slot>
                     <!-- 表格区域结束 -->
                     <!-- 分页区域开始 -->
                     <slot name="pagination"></slot>

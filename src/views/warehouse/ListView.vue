@@ -6,7 +6,7 @@
       <Search_box style="height:auto"></Search_box>
 
     </template>
-    <template #dataFable>
+    <template #dataTable>
 
       <Table_area style="margin-bottom:5px;"></Table_area>
     </template>

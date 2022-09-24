@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import $http from "../axios/login.js";
 import { mapMutations } from "vuex";
 import { NAMES } from "@/store";
@@ -83,24 +82,10 @@ export default {
       this.$refs["loginForm"].validate(async (valid) => {
         if (valid) {
           const { data } = await $http.login(this.form);
-          console.log(data);
+          console.log("data: ", data);
           if (data.code == 200) {
             this[NAMES.set_token](data);
             this.$router.replace("/home");
-            if (
-              localStorage.getItem("warehouseData") == "" ||
-              localStorage.getItem("warehouseData") == null ||
-              localStorage.getItem("warehouseData") == undefined ||
-              localStorage.getItem("warehouseData") == []
-            ) {
-              axios.get("/warehouse").then((res) => {
-                console.log(res.data.data);
-                localStorage.setItem(
-                  "warehouseData",
-                  JSON.stringify(res.data.data)
-                );
-              });
-            }
           }
         }
       });

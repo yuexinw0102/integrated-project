@@ -21,7 +21,7 @@ let data = Mock.mock("/warehouse", {
       "rider|2-4": [{
         "name": "@cname()",
         "phone": /1[3-9]\d{9}/,
-        "state":1
+        "state":1   
       }],
       "sorting|2-4": [{
         "name": "@cname()",

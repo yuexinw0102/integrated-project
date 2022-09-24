@@ -5,21 +5,17 @@
     label-width="auto"
     :inline="true"
   >
-    <el-form-item prop="input_name">
+    <el-form-item prop="name">
       <el-input
-        v-model="query_form.input_name"
+        v-model="query_form.name"
         style="width: 200px"
         size="small"
         placeholder="仓库名称"
       ></el-input>
     </el-form-item>
 
-    <el-form-item prop="city_value">
-      <el-select
-        v-model="query_form.city_value"
-        placeholder="所在城市"
-        size="small"
-      >
+    <el-form-item prop="city">
+      <el-select v-model="query_form.city" placeholder="所在城市" size="small">
         <el-option
           v-for="(item, index) in city"
           :key="index"
@@ -31,12 +27,8 @@
       </el-select>
     </el-form-item>
 
-    <el-form-item prop="area_value">
-      <el-select
-        v-model="query_form.area_value"
-        placeholder="所在区域"
-        size="small"
-      >
+    <el-form-item prop="area">
+      <el-select v-model="query_form.area" placeholder="所在区域" size="small">
         <el-option
           v-for="(item, index) in area"
           :key="index"
@@ -48,36 +40,36 @@
       </el-select>
     </el-form-item>
 
-    <el-form-item prop="input_acreage">
+    <el-form-item prop="acreage">
       <el-input
-        v-model.number="query_form.input_acreage"
+        v-model.number="query_form.acreage"
         style="width: 200px"
         size="small"
         placeholder="仓库面积 ~ 仓库面积"
       ></el-input>
     </el-form-item>
 
-    <el-form-item prop="input_community">
+    <el-form-item prop="community">
       <el-input
-        v-model.number="query_form.input_community"
+        v-model.number="query_form.community"
         style="width: 200px"
         size="small"
         placeholder="关联小区数"
       ></el-input>
     </el-form-item>
 
-    <el-form-item prop="input_rider">
+    <el-form-item prop="rider">
       <el-input
-        v-model.number="query_form.input_rider"
+        v-model.number="query_form.rider"
         style="width: 200px"
         size="small"
         placeholder="骑手数"
       ></el-input>
     </el-form-item>
 
-    <el-form-item prop="input_sorting">
+    <el-form-item prop="sorting">
       <el-input
-        v-model.number="query_form.input_sorting"
+        v-model.number="query_form.sorting"
         style="width: 205px"
         size="small"
         placeholder="分拣员数"
@@ -101,69 +93,100 @@
 
 <script>
 import bus from "@/eventBus/eventBus";
+import warehouse from "@/axios/warehouse";
 
 export default {
   data() {
     return {
       area: [],
       city: [],
-      tableData: JSON.parse(localStorage.getItem("warehouseData")),
+      tableData: [],
       showData: [],
       query_form: {
-        city_value: "",
-        area_value: "",
-        input_name: "",
-        input_acreage: "",
-        input_community: "",
-        input_rider: "",
-        input_sorting: "",
+        city: "",
+        area: "",
+        name: "",
+        acreage: "",
+        community: "",
+        rider: "",
+        sorting: "",
       },
     };
   },
   created() {
-    this.showData = this.tableData
-    let city = [];
-    let area = [];
-    this.tableData.forEach((item, index) => {
-      city.push({ label: item.city.val, disabled: false });
-      area.push({ label: item.area.val, disabled: false });
+    warehouse.search().then(({ data }) => {
+      if (data.status == "success") {
+        this.tableData = data.data;
+        this.showData = this.tableData;
+        this.handlerGetBox();
+      }
     });
-    let obj = {};
-    this.city = city.reduce(function (item, next) {
-      obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
-      return item;
-    }, []);
-    this.area = area.reduce(function (item, next) {
-      obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
-      return item;
-    }, []);
+    warehouse.searchCommunity().then(({ data }) => {
+      if (data.status == "success") {
+        this.showData.forEach((item) => {
+          data.data.forEach((item1) => {
+            if (item.id == item1.warehouseId) {
+              item.community = item1.community;
+            }
+          });
+        });
+      }
+    });
+    warehouse.searchRider().then(({ data }) => {
+      if (data.status == "success") {
+        this.showData.forEach((item) => {
+          data.data.forEach((item1) => {
+            if (item.id == item1.warehouseId) {
+              item.rider = item1.rider;
+            }
+          });
+        });
+      }
+    });
+    warehouse.searchSorting().then(({ data }) => {
+      if (data.status == "success") {
+        this.showData.forEach((item) => {
+          data.data.forEach((item1) => {
+            if (item.id == item1.warehouseId) {
+              item.sorting = item1.sorting;
+            }
+          });
+        });
+      }
+    });
   },
   mounted() {},
   methods: {
-    submitForm() {
-      this.showData = this.tableData.filter((item) => {
-        if (this.query_form.input_name !== "") {
-          return item.name.indexOf(this.query_form.input_name) !== -1;
-        }
-        if (
-          this.query_form.city_value !== "" ||
-          this.query_form.area_value !== "" ||
-          this.query_form.input_community !== "" ||
-          this.query_form.input_rider !== "" ||
-          this.query_form.input_sorting !== ""
-        ) {
-          return (
-            item.city.val === this.query_form.city_value ||
-            item.area.val === this.query_form.area_value ||
-            item.community.length === this.query_form.input_community ||
-            item.rider.length === this.query_form.input_rider ||
-            item.sorting.length === this.query_form.input_sorting
-          );
-        }
-        if (this.query_form.input_acreage !== "") {
-          return item.acreage >= this.query_form.input_acreage;
-        }
+    //获取所有城市和区域数据并去重
+    handlerGetBox() {
+      let city = [];
+      let area = [];
+      this.showData.forEach((item, index) => {
+        city.push({ label: item.city, disabled: false });
+        area.push({ label: item.area, disabled: false });
       });
+      let obj = {};
+      this.city = city.reduce(function (item, next) {
+        obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
+        return item;
+      }, []);
+      this.area = area.reduce(function (item, next) {
+        obj[next.label] ? "" : (obj[next.label] = true && item.push(next));
+        return item;
+      }, []);
+    },
+    submitForm() {
+      warehouse
+        .doSearch(this.query_form)
+        .then(({ data }) => {
+          console.log("handelSearch 查询", data);
+          this.showData = data.data;
+          console.log("handelSearch searchList", this.showData);
+        })
+        .catch((err) => {
+          console.log("search err--", err);
+          this.$message.error("Error error搜索失败");
+        });
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
@@ -174,6 +197,16 @@ export default {
     showData: function (newVal, oldVal) {
       if (newVal != oldVal) {
         bus.$emit("warehouse_query_form", newVal);
+      }
+    },
+    area: function (val) {
+      if (val == []) {
+        this.handlerGetBox;
+      }
+    },
+    city: function (val) {
+      if (val == []) {
+        this.handlerGetBox;
       }
     },
   },
