@@ -28,11 +28,9 @@ export default new Vuex.Store({
   plugins: [
     createPersistedState({
       storage: window.sessionStorage,
-      key:"token",
+      key: "token",
       reducer: (state) => {
-        return {
-          token: state.token,
-        }
+        return state.token
       }
     })
   ]

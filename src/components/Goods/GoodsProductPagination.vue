@@ -39,7 +39,7 @@
       },
     },
     mounted() {
-      console.log("total", this.total);
+      // console.log("total", this.total);
       // 获取数据总数
       // bus.$on("tableTotal", (val) => {
       //   // console.log("分页组件接收tableTotal", val);

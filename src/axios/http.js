@@ -7,7 +7,7 @@ const instance = axios.create({
 
 // 加上axios请求拦截器
 instance.interceptors.request.use(config => {
-    config.headers['Authorization'] = sessionStorage.getItem("token");
+    config.headers['Authorization'] = JSON.parse(sessionStorage.getItem("token"));
     return config;
 }, err => {
     console.log(err);
