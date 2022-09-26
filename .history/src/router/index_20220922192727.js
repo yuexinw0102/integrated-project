@@ -80,7 +80,7 @@ const routes = [
       },
       {
         path: "/new_warehouse",
-        name: "new_warehouse",
+        name: "new_warehouse", // 上面的name应该写在这里
         component: () =>
           import(
             /* webpackChunkName: "welcome" */ "../views/warehouse/AddOrEditView.vue"
@@ -139,6 +139,10 @@ router.beforeEach((to, from, next) => {
     next();
   } else {
     const store = JSON.parse(sessionStorage.getItem("token"));
+<<<<<<< HEAD
+    // console.log(store);
+=======
+>>>>>>> origin/feature-warehouse
     if (store === null || store === "" || store === undefined) {
       setTimeout(function () {
         next("/");

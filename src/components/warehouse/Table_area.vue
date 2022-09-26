@@ -36,12 +36,20 @@
           </template>
         </el-table-column>
         <el-table-column prop="acreage" label="仓库面积"> </el-table-column>
+
         <el-table-column prop="community.length" label="关联小区数">
         </el-table-column>
-        <el-table-column prop="rider.length" label="骑手数"> </el-table-column>
+        <el-table-column prop="rider.length" label="骑手数"></el-table-column>
         <el-table-column prop="sorting.length" label="分拣员数">
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column
+          label="操作"
+          :filters="[
+            { text: '已启用', value: '1' },
+            { text: '已停用', value: '0' },
+          ]"
+          :filter-method="rider"
+        >
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.state == 1"
@@ -80,6 +88,7 @@
 import bus from "@/eventBus/eventBus";
 import { mapMutations } from "vuex";
 import { NAMES } from "@/store";
+import router from "@/router";
 export default {
   data() {
     return {
@@ -93,6 +102,7 @@ export default {
   },
   mounted() {
     this.showData = this.tableData
+    console.log();
     bus.$on("warehouse_num_change", (val) => {
       this.page.page_num = val;
     });
@@ -107,7 +117,11 @@ export default {
       }
     });
   },
+  computed: {},
   methods: {
+    rider(value, row, column) {
+      return row.state == column.filteredValue[0];
+    },
     new_warehouse(id) {
       if (typeof id !== "number") {
         this.$router.replace("/new_warehouse");

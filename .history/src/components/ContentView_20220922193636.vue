@@ -6,7 +6,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <!-- 搜索框区域开始 -->
-                    <slot name="searchForm"></slot>
+                    <slot name="search_form"></slot>
                     <!-- 搜索框区域结束 -->
                 </div>
                 <div class="panel-body">

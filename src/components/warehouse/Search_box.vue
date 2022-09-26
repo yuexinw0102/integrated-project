@@ -100,7 +100,6 @@
 </style>
 
 <script>
-import axios from "axios";
 import bus from "@/eventBus/eventBus";
 
 export default {

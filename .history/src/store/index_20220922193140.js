@@ -41,7 +41,9 @@ export default new Vuex.Store({
       storage: window.sessionStorage,
       key:"token",
       reducer: (state) => {
-        return state.token
+        return {
+          token: state.token,
+        }
       }
     }),
   ]

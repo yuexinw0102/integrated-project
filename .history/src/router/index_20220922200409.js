@@ -20,12 +20,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/HomeView.vue"),
     children: [
-      {
-        path: "/welcome",
-        name: "welcome", // 上面的name应该写在这里
-        component: () =>
-          import(/* webpackChunkName: "welcome" */ "../views/WelcomeView.vue"),
-      },
+      // {
+      //   path: "/welcome",
+      //   name: "welcome", // 上面的name应该写在这里
+      //   component: () =>
+      //     import(/* webpackChunkName: "welcome" */ "../views/WelcomeView.vue"),
+      // },
       {
         path: "/user",
         name: "user",
@@ -80,7 +80,7 @@ const routes = [
       },
       {
         path: "/new_warehouse",
-        name: "new_warehouse",
+        name: "new_warehouse", // 上面的name应该写在这里
         component: () =>
           import(
             /* webpackChunkName: "welcome" */ "../views/warehouse/AddOrEditView.vue"

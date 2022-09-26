@@ -1,10 +1,10 @@
 <template>
   <ContentView>
-    <template #searchForm>
+    <template #search_form>
       <span>仓库管理</span>
       <Search_box style="height:auto"></Search_box>
     </template>
-    <template #dataTable>
+    <template #data_table>
       <Table_area style="margin-bottom:5px;"></Table_area>
     </template>
     <template v-slot:pagination>

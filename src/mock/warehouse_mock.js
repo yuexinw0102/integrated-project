@@ -1,6 +1,4 @@
 const Mock = require("mockjs");
-// 获取 mock.Random 对象
-const Random = Mock.Random;
 let data = Mock.mock("/warehouse", {
   "data|200": [
     {
@@ -23,10 +21,12 @@ let data = Mock.mock("/warehouse", {
       "rider|2-4": [{
         "name": "@cname()",
         "phone": /1[3-9]\d{9}/,
+        "state":1
       }],
       "sorting|2-4": [{
         "name": "@cname()",
         "phone": /1[3-9]\d{9}/,
+        "state":1
       }],
       state:1
     },
