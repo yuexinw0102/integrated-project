@@ -155,7 +155,6 @@ export default {
       }
     });
   },
-  mounted() {},
   methods: {
     //获取所有城市和区域数据并去重
     handlerGetBox() {

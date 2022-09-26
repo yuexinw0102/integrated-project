@@ -8,24 +8,6 @@ export default new (class {
     });
   }
 
-  searchCommunity(form) {
-    return $http.get(`${suffix}/getCommunity.do`, {
-      params: form,
-    });
-  }
-
-  searchRider(form) {
-    return $http.get(`${suffix}/getRider.do`, {
-      params: form,
-    });
-  }
-
-  searchSorting(form) {
-    return $http.get(`${suffix}/getSorting.do`, {
-      params: form,
-    });
-  }
-
   doSearch(form) {
     return $http.get(`${suffix}/getByPage.do`, {
       params: form,

@@ -38,10 +38,10 @@
         <el-form-item label="关联小区" type="flex" justify="">
           <el-input
             placeholder="请输入小区名称"
-            v-model="searchData.searchCommunity"
+            v-model="queryData.searchCommunity"
             style="width: 200px"
           ></el-input>
-          <el-button type="primary" @click="search('community')"
+          <el-button type="primary" @click="search('communityData')"
             >查询</el-button
           >
           <el-button type="primary" @click="dialogFormVisible = true"
@@ -99,10 +99,12 @@
         <el-form-item label="配置骑手" type="flex" justify="">
           <el-input
             placeholder="请输入骑手名称"
-            v-model="searchData.searchRider"
+            v-model="queryData.searchRider"
             style="width: 200px"
           ></el-input>
-          <el-button type="primary" @click="search('rider')">查询</el-button>
+          <el-button type="primary" @click="search('riderData')"
+            >查询</el-button
+          >
           <el-button type="primary" @click="dialogFormVisible1 = true"
             >新增骑手</el-button
           >
@@ -167,10 +169,12 @@
         <el-form-item label="配置分拣员" type="flex" justify="">
           <el-input
             placeholder="请输入分拣员名称"
-            v-model="searchData.searchSorting"
+            v-model="queryData.searchSorting"
             style="width: 200px"
           ></el-input>
-          <el-button type="primary" @click="search('sorting')">查询</el-button>
+          <el-button type="primary" @click="search('sortingData')"
+            >查询</el-button
+          >
           <el-button type="primary" @click="dialogFormVisible2 = true"
             >新增分拣员</el-button
           >
@@ -277,12 +281,14 @@ export default {
       riderData: [],
       sortingData: [],
       searchData: {
-        searchCommunity: "",
-        searchRider: "",
-        searchSorting: "",
         communityData: [],
         riderData: [],
         sortingData: [],
+      },
+      queryData: {
+        searchCommunity: "",
+        searchRider: "",
+        searchSorting: "",
       },
       form: {
         id: "",
@@ -419,18 +425,39 @@ export default {
       });
     },
     search(dataName) {
-      if (dataName == "community") {
-        this.communityData = this.form[dataName].filter(
-          (item) => item.name == this.searchCommunity
-        );
-      } else if (dataName == "rider") {
-        this.riderData = this.form[dataName].filter(
-          (item) => item.name == this.searchRider
-        );
-      } else if (dataName == "sorting") {
-        this.sortingData = this.form[dataName].filter(
-          (item) => item.name == this.searchSorting
-        );
+      if (dataName == "communityData") {
+        warehouseCommunity
+          .doSearch({
+            name: this.queryData.searchCommunity,
+            warehouseId: this.dataId,
+          })
+          .then(({ data }) => (this.searchData.communityData = data.data))
+          .catch((err) => {
+            console.log("search err--", err);
+            this.$message.error("Error error搜索失败");
+          });
+      } else if (dataName == "riderData") {
+        warehouseRider
+          .doSearch({
+            name: this.queryData.searchRider,
+            warehouseId: this.dataId,
+          })
+          .then(({ data }) => (this.searchData.riderData = data.data))
+          .catch((err) => {
+            console.log("search err--", err);
+            this.$message.error("Error error搜索失败");
+          });
+      } else if (dataName == "sortingData") {
+        warehouseSorting
+          .doSearch({
+            name: this.queryData.searchSorting,
+            warehouseId: this.dataId,
+          })
+          .then(({ data }) => (this.searchData.sortingData = data.data))
+          .catch((err) => {
+            console.log("search err--", err);
+            this.$message.error("Error error搜索失败");
+          });
       }
     },
 
