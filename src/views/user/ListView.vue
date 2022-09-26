@@ -180,8 +180,14 @@
           <el-table-column prop="userTel" label="手机号" width="170">
           </el-table-column>
           <el-table-column prop="createTime" label="注册时间" width="205">
+            <template v-slot="scope">
+              {{ scope.row.createTime | dataFormat }}
+            </template>
           </el-table-column>
           <el-table-column prop="updateTime" label="最近登录时间" width="205">
+            <template v-slot="scope">
+                    {{ scope.row.updateTime | dataFormat }}
+                  </template>
           </el-table-column>
           <el-table-column prop="consumeSum" label="消费金额" width="160">
           </el-table-column>
@@ -199,7 +205,7 @@
 </template>
 
 <script>
-  // searchList.length != 0 ? searchList.length : tableData.length
+  // searchList.length != 0 ? searchList.length : tableData.length 
   import axios from "axios";
   import bus from "@/eventBus/eventBus.js"; // 引入兄弟组件传值中间件
   import ContentView from "@/components/ContentView.vue";
@@ -237,10 +243,6 @@
     },
     mounted() {
       this.handleGetData();
-      // this.handleGetTestData();
-      /* user.getAll().then(({ data }) => {
-        this.tableData = data.data;
-      }) */
       bus.$on("sizeChange", (val) => {
         this.page.pageSize = val;
         this.page.currentPage = 1; // size变化时页码置为1

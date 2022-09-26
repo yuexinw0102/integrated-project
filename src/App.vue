@@ -1,12 +1,14 @@
 <template>
-  <div id="root">
-    <router-view/>
+  <div id="app">
+    <!--路由占位符-->
+    <router-view />
   </div>
 </template>
 
-<style lang="less">
-#root {
-	height: 100%;
-	width: 100%;
-}
-</style>
+<script>
+  export default {
+    name: "app",
+  };
+</script>
+
+<style></style>
