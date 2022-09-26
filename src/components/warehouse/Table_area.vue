@@ -98,9 +98,39 @@ export default {
       },
     };
   },
-  created() {},
+  async created() {
+    let data = await warehouse.search();
+    let data1 = await warehouse.searchCommunity();
+    let data2 = await warehouse.searchRider();
+    let data3 = await warehouse.searchSorting();
+    if (
+      data.data.status == "success" &&
+      data1.data.status == "success" &&
+      data2.data.status == "success" &&
+      data3.data.status == "success"
+    ) {
+      this.tableData = data.data.data;
+      this.showData = this.tableData;
+      this.showData.forEach((item) => {
+        data1.data.data.forEach((item1) => {
+          if (item.id == item1.warehouseId) {
+            item.community = item1.community;
+          }
+        });
+        data2.data.data.forEach((item1) => {
+          if (item.id == item1.warehouseId) {
+            item.rider = item1.rider;
+          }
+        });
+        data3.data.data.forEach((item1) => {
+          if (item.id == item1.warehouseId) {
+            item.sorting = item1.sorting;
+          }
+        });
+      });
+    }
+  },
   mounted() {
-    this.handlerGetData();
     bus.$on("warehouse_num_change", (val) => {
       this.page.page_num = val;
     });
@@ -118,53 +148,12 @@ export default {
   computed: {},
   methods: {
     //获取数据
-    handlerGetData() {
-      warehouse.search().then(({ data }) => {
-        if (data.status == "success") {
-          this.tableData = data.data;
-          this.showData = this.tableData;
-        }
-      });
-      warehouse.searchCommunity().then(({ data }) => {
-        if (data.status == "success") {
-          this.showData.forEach((item) => {
-            data.data.forEach((item1) => {
-              if (item.id == item1.warehouseId) {
-                item.community = item1.community;
-              }
-            });
-          });
-        }
-      });
-      warehouse.searchRider().then(({ data }) => {
-        if (data.status == "success") {
-          this.showData.forEach((item) => {
-            data.data.forEach((item1) => {
-              if (item.id == item1.warehouseId) {
-                item.rider = item1.rider;
-              }
-            });
-          });
-        }
-      });
-      warehouse.searchSorting().then(({ data }) => {
-        if (data.status == "success") {
-          this.showData.forEach((item) => {
-            data.data.forEach((item1) => {
-              if (item.id == item1.warehouseId) {
-                item.sorting = item1.sorting;
-              }
-            });
-          });
-        }
-      });
-    },
     rider(value, row, column) {
       return row.state == column.filteredValue[0];
     },
     new_warehouse(id) {
       console.log(id);
-      this.$router.replace({path:"/new_warehouse",query:{id:id}});
+      this.$router.replace({ path: "/new_warehouse", query: { id: id } });
       // this[NAMES.set_warehouseDataId](id);
     },
     state({ row, rowIndex }) {
@@ -225,12 +214,6 @@ export default {
       if (newVal != oldVal) {
         bus.$emit("warehouse_get_count", this.showData.length);
       }
-      // newVal.forEach(val => {
-      //   console.log(val);
-      //   if (val.state == "0") {
-      //     this.state()
-      //   }
-      // })
     },
   },
 };
