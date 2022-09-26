@@ -1,23 +1,13 @@
-<template>
-    <div>
-        缺勤记录添加或编辑
-    </div>
+<template #state>
+  <!-- <State></State> -->
+  <div>
+    订单详情
+  </div>
 </template>
-
 <script>
-    export default {
-        name: "AbsencesAddOrEdit",
-        data() {
-            return {
-                
-            }
-        },
-        methods: {
-            
-        },
-    }
+// import State from '@/components/warehouse/state.vue';
+  export default {
+  name: "AbsencesList",
+  // components: { State },
+};
 </script>
-
-<style>
-
-</style>

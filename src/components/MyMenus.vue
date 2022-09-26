@@ -1,7 +1,7 @@
 <template>
   <el-col style="height: 100%">
     <el-menu
-      default-active="/welcome"
+      :default-active=this.$route.path
       class="el-menu-vertical-demo"
       background-color="#545c64"
       text-color="#fff"

@@ -22,7 +22,7 @@
 import ContentView from "@/components/ContentView.vue";
 import Search_box from "@/components/warehouse/Search_box.vue";
 import Table_area from "@/components/warehouse/Table_area.vue";
-import Pagination from "@/components/warehouse/Pagination.vue";
+import Pagination from "@/components/Pagination.vue";
 export default {
   name: "ListView",
   components: { ContentView, Search_box, Table_area, Pagination },
