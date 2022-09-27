@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     handel_command(command) {
-      sessionStorage.removeItem("vuex");
+      sessionStorage.removeItem("token");
       this.$router.replace("/login");
     },
   },

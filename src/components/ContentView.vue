@@ -4,7 +4,7 @@
             <!-- 面包屑区域 -->
             <slot name="breadcrumb"></slot>
             <div class="panel panel-default">
-                <div class="panel-heading">
+                <div class="panelHeading">
                     <!-- 搜索框区域开始 -->
                     <slot name="searchForm"></slot>
                     <!-- 搜索框区域结束 -->

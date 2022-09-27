@@ -1,22 +1,44 @@
-import axios from "axios";
+import $http from "./http.js";
+const suffix = "/warehouse";
 
-export default {
-  data() {
-    return {
-      data: [],
-    };
-  },
-  mounted: function () {
-    axios
-      .get("/warehouse")
-      .then((res) => {
-        //get()中的参数要与mock.js文件中的Mock.mock()配置的路由保持一致
-        this.data = res;
-        console.log(res.data); //在console中看到数据
-      })
-      .catch((res) => {
-        alert("wrong");
-      });
-  },
-  methods: {},
-};
+export default new (class {
+  search(form) {
+    return $http.get(`${suffix}/getAll.do`, {
+      params: form,
+    });
+  }
+
+  searchCommunity(form) {
+    return $http.get(`${suffix}/getCommunity.do`, {
+      params: form,
+    });
+  }
+
+  searchRider(form) {
+    return $http.get(`${suffix}/getRider.do`, {
+      params: form,
+    });
+  }
+
+  searchSorting(form) {
+    return $http.get(`${suffix}/getSorting.do`, {
+      params: form,
+    });
+  }
+
+  doSearch(form) {
+    return $http.get(`${suffix}/getByPage.do`, {
+      params: form,
+    });
+  }
+
+  edit(form) {
+    return $http.post(`${suffix}/edit.do`, form);
+  }
+
+  add(form) {
+    console.log("add--", form);
+    return $http.post(`${suffix}/add.do`, form);
+  }
+
+})();

@@ -5,12 +5,34 @@
     label-width="auto"
     :inline="true"
   >
-    <el-form-item prop="name">
+    <el-form-item prop="id">
       <el-input
-        v-model="query_form.name"
+        v-model="query_form.id"
         style="width: 200px"
         size="small"
-        placeholder="仓库名称"
+        placeholder="订单编号"
+      ></el-input>
+    </el-form-item>
+
+    <el-form-item prop="state">
+      <el-select v-model="query_form.sortingState" placeholder="分拣状态" size="small">
+        <el-option
+          v-for="(item, index) in options"
+          :key="index.value"
+          :label="item.label"
+          :value="item.value"
+        >
+          <span style="float: left">{{ item.label }}</span>
+        </el-option>
+      </el-select>
+    </el-form-item>
+
+    <el-form-item prop="timeLength">
+      <el-input
+        v-model.number="query_form.sortingTime"
+        style="width: 200px"
+        size="small"
+        placeholder="分拣时长"
       ></el-input>
     </el-form-item>
 
@@ -40,39 +62,23 @@
       </el-select>
     </el-form-item>
 
-    <el-form-item prop="acreage">
-      <el-input
-        v-model.number="query_form.acreage"
-        style="width: 200px"
+    <el-form-item prop="time">
+      <el-date-picker
+        v-model="query_form.time"
+        type="datetime"
+        value-format="yyyy-MM-dd HH:mm:ss"
         size="small"
-        placeholder="仓库面积 ~ 仓库面积"
-      ></el-input>
+        placeholder="下单时间"
+      >
+      </el-date-picker>
     </el-form-item>
 
-    <el-form-item prop="community">
+    <el-form-item prop="quantity">
       <el-input
-        v-model.number="query_form.community"
+        v-model="query_form.quantity"
         style="width: 200px"
         size="small"
-        placeholder="关联小区数"
-      ></el-input>
-    </el-form-item>
-
-    <el-form-item prop="rider">
-      <el-input
-        v-model.number="query_form.rider"
-        style="width: 200px"
-        size="small"
-        placeholder="骑手数"
-      ></el-input>
-    </el-form-item>
-
-    <el-form-item prop="sorting">
-      <el-input
-        v-model.number="query_form.sorting"
-        style="width: 205px"
-        size="small"
-        placeholder="分拣员数"
+        placeholder="商品数量"
       ></el-input>
     </el-form-item>
 
@@ -94,6 +100,8 @@
 <script>
 import bus from "@/eventBus/eventBus";
 import warehouse from "@/axios/warehouse";
+import order from "@/axios/order";
+import warehouseSorting from "@/axios/warehouseSorting";
 
 export default {
   data() {
@@ -105,41 +113,36 @@ export default {
       query_form: {
         city: "",
         area: "",
-        name: "",
-        acreage: "",
-        community: "",
-        rider: "",
-        sorting: "",
+        id: "",
+        time: "",
+        quantity: "",
+        sortingTime: "",
+        sortingState: "",
       },
+      options: [
+        { value: "1", label: "已分拣" },
+        { value: "0", label: "未分拣" },
+      ],
     };
   },
   async created() {
-    let data = await warehouse.search();
-    let data1 = await warehouse.searchCommunity();
-    let data2 = await warehouse.searchRider();
-    let data3 = await warehouse.searchSorting();
-    if (
-      data.data.status == "success" &&
-      data1.data.status == "success" &&
-      data2.data.status == "success" &&
-      data3.data.status == "success"
-    ) {
+    let data = await order.search();
+    let data1 = await warehouse.search();
+
+    if (data.data.status == "success" && data1.data.status == "success") {
       this.tableData = data.data.data;
       this.showData = this.tableData;
       this.showData.forEach((item) => {
+        if (item.state == "1") {
+          item.state = "已分拣";
+        } else if (item.state == "0") {
+          item.state = "未分拣";
+        }
         data1.data.data.forEach((item1) => {
-          if (item.id == item1.warehouseId) {
-            item.community = item1.community;
-          }
-        });
-        data2.data.data.forEach((item1) => {
-          if (item.id == item1.warehouseId) {
-            item.rider = item1.rider;
-          }
-        });
-        data3.data.data.forEach((item1) => {
-          if (item.id == item1.warehouseId) {
-            item.sorting = item1.sorting;
+          if (item.warehouseId == item1.id) {
+            item.warehouse = item1.name;
+            item.city = item1.city;
+            item.area = item1.area;
           }
         });
       });
@@ -159,15 +162,12 @@ export default {
       this.area = [...new Set(area)];
     },
     submitForm() {
-      warehouse
+      sorting
         .doSearch(this.query_form)
         .then(({ data }) => {
-          console.log("handelSearch 查询", data);
           this.showData = data.data;
-          console.log("handelSearch searchList", this.showData);
         })
         .catch((err) => {
-          console.log("search err--", err);
           this.$message.error("Error error搜索失败");
         });
     },
@@ -177,9 +177,33 @@ export default {
     },
   },
   watch: {
-    showData: function (newVal, oldVal) {
+    showData: async function (newVal, oldVal) {
       if (newVal != oldVal) {
         bus.$emit("warehouse_query_form", newVal);
+        let data1 = await warehouse.search();
+        let data2 = await warehouseSorting.search();
+
+        if (data1.data.status == "success" && data2.data.status == "success") {
+          this.showData.forEach((item) => {
+            if (item.state == "1") {
+              item.state = "已分拣";
+            } else if (item.state == "0") {
+              item.state = "未分拣";
+            }
+            data1.data.data.forEach((item1) => {
+              if (item.warehouseId == item1.id) {
+                item.warehouse = item1.name;
+                item.city = item1.city;
+                item.area = item1.area;
+              }
+            });
+            data2.data.data.forEach((item1) => {
+              if (item.warehouseId == item1.warehouseId) {
+                item.sorting = item1.name;
+              }
+            });
+          });
+        }
       }
     },
     area: function (val) {

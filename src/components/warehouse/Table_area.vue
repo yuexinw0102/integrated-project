@@ -21,14 +21,14 @@
         :row-class-name="state"
       >
         <el-table-column prop="name" label="仓库名称"> </el-table-column>
-        <el-table-column prop="city.val" label="所在城市"> </el-table-column>
-        <el-table-column prop="area.val" label="所在区域"> </el-table-column>
+        <el-table-column prop="city" label="所在城市"> </el-table-column>
+        <el-table-column prop="area" label="所在区域"> </el-table-column>
         <el-table-column prop="date" label="仓库地址">
           <template slot-scope="scope">
             <el-popover trigger="click" placement="top">
-              <p>所在城市: {{ scope.row.city.val }}</p>
-              <p>所在区域: {{ scope.row.area.val }}</p>
-              <p>详细地址: {{ scope.row.detailed_address }}</p>
+              <p>所在城市: {{ scope.row.city }}</p>
+              <p>所在区域: {{ scope.row.area }}</p>
+              <p>详细地址: {{ scope.row.detailedAddress }}</p>
               <div slot="reference" class="name-wrapper">
                 <el-button type="text" size="small">查看</el-button>
               </div>
@@ -37,11 +37,9 @@
         </el-table-column>
         <el-table-column prop="acreage" label="仓库面积"> </el-table-column>
 
-        <el-table-column prop="community.length" label="关联小区数">
-        </el-table-column>
-        <el-table-column prop="rider.length" label="骑手数"></el-table-column>
-        <el-table-column prop="sorting.length" label="分拣员数">
-        </el-table-column>
+        <el-table-column prop="community" label="关联小区数"> </el-table-column>
+        <el-table-column prop="rider" label="骑手数"></el-table-column>
+        <el-table-column prop="sorting" label="分拣员数"> </el-table-column>
         <el-table-column
           label="操作"
           :filters="[
@@ -88,11 +86,11 @@
 import bus from "@/eventBus/eventBus";
 import { mapMutations } from "vuex";
 import { NAMES } from "@/store";
-import router from "@/router";
+import warehouse from "@/axios/warehouse";
 export default {
   data() {
     return {
-      tableData: JSON.parse(localStorage.getItem("warehouseData")),
+      tableData: [],
       showData: [],
       page: {
         page_size: 10,
@@ -100,9 +98,39 @@ export default {
       },
     };
   },
+  async created() {
+    let data = await warehouse.search();
+    let data1 = await warehouse.searchCommunity();
+    let data2 = await warehouse.searchRider();
+    let data3 = await warehouse.searchSorting();
+    if (
+      data.data.status == "success" &&
+      data1.data.status == "success" &&
+      data2.data.status == "success" &&
+      data3.data.status == "success"
+    ) {
+      this.tableData = data.data.data;
+      this.showData = this.tableData;
+      this.showData.forEach((item) => {
+        data1.data.data.forEach((item1) => {
+          if (item.id == item1.warehouseId) {
+            item.community = item1.community;
+          }
+        });
+        data2.data.data.forEach((item1) => {
+          if (item.id == item1.warehouseId) {
+            item.rider = item1.rider;
+          }
+        });
+        data3.data.data.forEach((item1) => {
+          if (item.id == item1.warehouseId) {
+            item.sorting = item1.sorting;
+          }
+        });
+      });
+    }
+  },
   mounted() {
-    this.showData = this.tableData
-    console.log();
     bus.$on("warehouse_num_change", (val) => {
       this.page.page_num = val;
     });
@@ -119,19 +147,14 @@ export default {
   },
   computed: {},
   methods: {
+    //获取数据
     rider(value, row, column) {
       return row.state == column.filteredValue[0];
     },
     new_warehouse(id) {
-      if (typeof id !== "number") {
-        this.$router.replace("/new_warehouse");
-        this[NAMES.set_warehouseDataId]("");
-        this[NAMES.set_warehouseEditor]("新增仓库");
-      } else {
-        this.$router.replace("/new_warehouse");
-        this[NAMES.set_warehouseDataId](id);
-        this[NAMES.set_warehouseEditor]("仓库详情");
-      }
+      console.log(id);
+      this.$router.replace({ path: "/new_warehouse", query: { id: id } });
+      // this[NAMES.set_warehouseDataId](id);
     },
     state({ row, rowIndex }) {
       if (row.state === 0) {
@@ -142,6 +165,22 @@ export default {
       this.showData.forEach((item) => {
         if (item.id === id) {
           item.state = 0;
+          warehouse
+            .edit({ state: `${item.state}`, id: item.id })
+            .then(({ data }) => {
+              console.log("handleEdit data", data);
+              if (data.status == "success") {
+                this.$message({
+                  type: "success",
+                  message: "已停用",
+                });
+              } else {
+                this.$message.error("停用失败");
+              }
+            })
+            .catch((err) => {
+              console.log("handleEdit err", err);
+            });
         }
       });
     },
@@ -149,6 +188,22 @@ export default {
       this.showData.forEach((item) => {
         if (item.id === id) {
           item.state = 1;
+          warehouse
+            .edit({ state: `${item.state}`, id: item.id })
+            .then(({ data }) => {
+              console.log("handleEdit data", data);
+              if (data.status == "success") {
+                this.$message({
+                  type: "success",
+                  message: "已启用",
+                });
+              } else {
+                this.$message.error("启用失败");
+              }
+            })
+            .catch((err) => {
+              console.log("handleEdit err", err);
+            });
         }
       });
     },
