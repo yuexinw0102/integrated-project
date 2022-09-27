@@ -15,7 +15,11 @@
     </el-form-item>
 
     <el-form-item prop="state">
-      <el-select v-model="query_form.sortingState" placeholder="分拣状态" size="small">
+      <el-select
+        v-model="query_form.sortingState"
+        placeholder="分拣状态"
+        size="small"
+      >
         <el-option
           v-for="(item, index) in options"
           :key="index.value"
@@ -145,6 +149,8 @@ export default {
             item.area = item1.area;
           }
         });
+        const moment = require("moment");
+        item.time = moment(item.time).format("Y-MM-DD HH:mm:ss");
       });
     }
     this.handlerGetBox();

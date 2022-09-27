@@ -4,7 +4,9 @@
     <template v-slot:breadcrumb>
       <el-card shadow="never">
         <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/welcome' }"
+            >首页</el-breadcrumb-item
+          >
           <el-breadcrumb-item>订单管理</el-breadcrumb-item>
           <el-breadcrumb-item>订单列表</el-breadcrumb-item>
         </el-breadcrumb>
