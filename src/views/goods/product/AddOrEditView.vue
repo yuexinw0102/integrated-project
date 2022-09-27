@@ -128,46 +128,18 @@
         <el-col>
           <el-form-item label="商品轮播">
             <el-upload
-              action="http://localhost:3000/goodsProduct/add.do"
               list-type="picture-card"
-              :auto-upload="false"
+              class="avatar-uploader"
+              action="http://localhost:3000/upload"
+              :on-success="handleImgSuccess"
               :before-upload="beforeSlideShowUpload"
             >
-              <i slot="default" class="el-icon-plus"></i>
-              <div slot="file" slot-scope="{ file }">
-                <img
-                  class="el-upload-list__item-thumbnail"
-                  :src="file.url"
-                  alt=""
-                />
-                <span class="el-upload-list__item-actions">
-                  <span
-                    class="el-upload-list__item-preview"
-                    @click="handlePictureCardPreview(file)"
-                  >
-                    <i class="el-icon-zoom-in"></i>
-                  </span>
-                  <span
-                    v-if="!goodsSlideShow.disabled"
-                    class="el-upload-list__item-delete"
-                    @click="handleDownload(file)"
-                  >
-                    <i class="el-icon-download"></i>
-                  </span>
-                  <span
-                    v-if="!goodsSlideShow.disabled"
-                    class="el-upload-list__item-delete"
-                    @click="handleRemove(file)"
-                  >
-                    <i class="el-icon-delete"></i>
-                  </span>
-                </span>
-              </div>
-              <template #tip>
-                <div style="font-size: 12px; color: #919191">
-                  只能上传.jpg/png文件，且不超过500kb
-                </div>
-              </template>
+              <img
+                v-if="form.slideShowImgUrl"
+                :src="form.slideShowImgUrl"
+                class="avatar"
+              />
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <el-dialog
               v-if="goodsSlideShow"
@@ -299,8 +271,8 @@
         <el-button
           size="small"
           type="primary"
-          @click="handleSubmit"
           :loading="loading"
+          @click="handleSubmit"
           >{{ loading ? "提交中 ..." : "保存资料" }}</el-button
         >
         <el-button size="small" type="primary">商品下架</el-button>
@@ -310,7 +282,9 @@
 </template>
 
 <script>
+  //@click="handleSubmit"
   import product from "@/axios/goods/product";
+  import uploads from "@/axios/goods/uploads";
   import { mapMutations, mapState } from "vuex";
   import { NAMES } from "@/store"; // 取出token
   // import slideShow from "@/axios/goods/productSlideShow";
@@ -387,9 +361,9 @@
           isGreenDiscounts: "", // 绿卡优惠
           greenPrice: "", // 绿卡价格
         },
-        // 存放token
+        // 设置请求头存放token
         headersObj: {
-          Authorization: sessionStorage.getItem("token"),
+          Authorization: JSON.parse(sessionStorage.getItem("token")).token,
         },
         // 存放商品轮播图
         goodsSlideShow: {
@@ -438,6 +412,11 @@
                   this.form.id = parseInt(this.maxId) + 1;
                   console.log("add form--", this.form);
                   product.add(this.form).then(({ data }) => {
+                    uploads
+                      .upload(this.form.slideShowImgUrl)
+                      .then(({ data }) => {
+                        console.log("upload data--", data);
+                      });
                     console.log("add data--", data);
                     // alert(data.message);
                     if (data.status == "success") {
@@ -446,7 +425,7 @@
                         type: "success",
                       });
                     } else {
-                      this.$message.error(data.err.sqlMessage);
+                      this.$message.error("添加失败");
                     }
                   });
                   /*  console.log(this.goodsSlideShow);
@@ -479,17 +458,46 @@
         // formData.append("materialType", data.file);
       }, */
 
-      // 转码处理函数
+      // 上传图片前进行格式和文件大小检查
       beforeSlideShowUpload(file) {
-        let _this = this;
-        return new Promise((resolve, reject) => {
-          let reader = new FileReader();
-          reader.readAsDataURL(file); // 转换成base64
-          reader.onload = (event) => {
-            console.log("event", event);
-            _this.form.slideShowImgUrl.push(event.target.result); // 定义参数获取图片路径
-          };
-        });
+        console.log("Uploading image file", file);
+        const ext = file.name.substring(file.name.lastIndexOf(".") + 1);
+        console.log("ext", ext);
+        const extension =
+          ext === ".jpg" ||
+          ext === ".JPG" ||
+          ext === ".jpeg" ||
+          ext === ".JPEG" ||
+          ext === ".png" ||
+          ext === ".PNG";
+        const isLt2M = file.size / 1024 / 1024 < 7; // 不超过2M
+        if (!extension) {
+          this.$message({
+            type: "error",
+            message: "上传的图片的格式只能是 jpg/png 格式",
+          });
+          return false;
+        }
+        console.log(file);
+        // if (!isLt2M) {
+        //   this.$message({
+        //     type: "error",
+        //     message: "上传文件的大小不超过 2M",
+        //   });
+        //   return false;
+        // }
+        return extension || isLt2M;
+      },
+      // 监听上传成功的函数
+      handleImgSuccess(response, file, fileList) {
+        console.log("handleImgSuccess response", response);
+        console.log("handleImgSuccess file", file);
+        const imgInfo = {
+          name: file.name, // 参考elementUI属性 file-list
+          url: response.data.tmp_path, // 临时路径
+        };
+        // this.form.slideShowImgUrl.push(imgInfo); // 存入数组
+        this.form.slideShowImgUrl = URL.createObjectURL(file.raw);
       },
 
       //   上传商品轮播图相关方法
@@ -501,7 +509,7 @@
         // 预览图片
         console.log(this.goodsSlideShow);
         console.log(file);
-        this.form.slideShowImgUrl = file.url;
+        this.form.slideShowImgUrl = file.url; // 报错
         this.goodsSlideShow.dialogVisible = true;
       },
       handleDownload(file) {
@@ -525,4 +533,28 @@
   };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>

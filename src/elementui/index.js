@@ -42,7 +42,6 @@ import {
   FormItem,
   Tabs,
   TabPane,
-  Tag,
   Tree,
   Alert,
   Slider,
@@ -82,8 +81,13 @@ import {
   MessageBox,
   Message,
   Notification,
+  Drawer,
+  Tag,
 } from "element-ui";
 
+
+Vue.use(Tag);
+Vue.use(Drawer);
 Vue.use(Pagination);
 Vue.use(Avatar);
 Vue.use(Descriptions);
@@ -124,7 +128,6 @@ Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Tabs);
 Vue.use(TabPane);
-Vue.use(Tag);
 Vue.use(Tree);
 Vue.use(Alert);
 Vue.use(Slider);
