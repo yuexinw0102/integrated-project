@@ -170,6 +170,8 @@ export default {
             item.value = item1.value;
           }
         });
+        const moment = require("moment");
+        item.time = moment(item.time).format("Y-MM-DD HH:mm:ss");
       });
     }
   },

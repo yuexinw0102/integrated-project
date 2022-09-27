@@ -1,6 +1,14 @@
 <template>
   <el-row>
     <el-col>
+      <p>
+        <span>{{ waitingPayment | WaitingPayment }}</span>
+        <span>{{ waitingSorting | WaitingSorting }}</span>
+        <span>{{ waitingRider | WaitingRider }}</span>
+        <span>{{ onRider | OnRider }}</span>
+        <span>{{ deal | Deal }}</span>
+        <span>{{ dealOut | DealOut }}</span>
+      </p>
       <el-table
         :data="
           showData.slice(
@@ -10,7 +18,7 @@
         "
         border
         style="width: 100%; overflow: auto"
-        height="500"
+        height="430"
       >
         <el-table-column prop="id" label="订单编号"> </el-table-column>
         <el-table-column prop="time" label="下单时间"> </el-table-column>
@@ -57,6 +65,12 @@ export default {
     return {
       tableData: [],
       showData: [],
+      waitingPayment: "",
+      waitingSorting: "",
+      waitingRider: "",
+      onRider: "",
+      deal: "",
+      dealOut: "",
       page: {
         page_size: 10,
         page_num: 1,
@@ -70,25 +84,37 @@ export default {
     if (data.data.status == "success" && data1.data.status == "success") {
       this.tableData = data.data.data;
       this.showData = this.tableData;
+      let waitingPayment = [];
+      let waitingSorting = [];
+      let waitingRider = [];
+      let onRider = [];
+      let deal = [];
+      let dealOut = [];
       this.showData.forEach((item) => {
         if (item.orderState == "0") {
           item.orderState = "待支付";
+          waitingPayment.push(item);
         } else if (item.orderState == "1") {
           item.orderState = "待分拣";
+          waitingSorting.push(item);
         } else if (item.orderState == "2") {
           item.orderState = "待配送";
+          waitingRider.push(item);
         } else if (item.orderState == "3") {
           item.orderState = "配送中";
+          onRider.push(item);
         } else if (item.orderState == "4") {
           item.orderState = "交易完成";
+          deal.push(item);
         } else if (item.orderState == "5") {
           item.orderState = "交易关闭";
+          dealOut.push(item);
         }
         if (item.payment == "0") {
           item.payment = "/";
-        }else if (item.payment == "1") {
+        } else if (item.payment == "1") {
           item.payment = "微信支付";
-        }else if (item.payment == "2") {
+        } else if (item.payment == "2") {
           item.payment = "支付宝支付";
         }
         data1.data.data.forEach((item1) => {
@@ -97,7 +123,15 @@ export default {
             item.value = item1.value;
           }
         });
+        const moment = require("moment");
+        item.time = moment(item.time).format("Y-MM-DD HH:mm:ss");
       });
+      this.waitingPayment = waitingPayment.length;
+      this.waitingSorting = waitingSorting.length;
+      this.waitingRider = waitingRider.length;
+      this.onRider = onRider.length;
+      this.deal = deal.length;
+      this.dealOut = dealOut.length;
     }
   },
   mounted() {
@@ -126,6 +160,26 @@ export default {
       if (newVal != oldVal) {
         bus.$emit("warehouse_get_count", this.showData.length);
       }
+    },
+  },
+  filters: {
+    WaitingSorting(value) {
+      return "待分拣（" + value + "） ";
+    },
+    WaitingRider(value) {
+      return "待配送（" + value + "） ";
+    },
+    WaitingPayment(value) {
+      return "待支付（" + value + "） ";
+    },
+    OnRider(value) {
+      return "配送中（" + value + "） ";
+    },
+    Deal(value) {
+      return "交易完成（" + value + "） ";
+    },
+    DealOut(value) {
+      return "交易关闭（" + value + "） ";
     },
   },
 };

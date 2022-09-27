@@ -17,7 +17,7 @@
         "
         border
         style="width: 100%; overflow: auto"
-        height="450"
+        height="430"
         :row-class-name="state"
       >
         <el-table-column prop="name" label="仓库名称"> </el-table-column>
@@ -84,8 +84,6 @@
 </style>
 <script>
 import bus from "@/eventBus/eventBus";
-import { mapMutations } from "vuex";
-import { NAMES } from "@/store";
 import warehouse from "@/axios/warehouse";
 export default {
   data() {
@@ -154,7 +152,6 @@ export default {
     new_warehouse(id) {
       console.log(id);
       this.$router.replace({ path: "/new_warehouse", query: { id: id } });
-      // this[NAMES.set_warehouseDataId](id);
     },
     state({ row, rowIndex }) {
       if (row.state === 0) {
@@ -207,7 +204,6 @@ export default {
         }
       });
     },
-    ...mapMutations([NAMES.set_warehouseEditor, NAMES.set_warehouseDataId]),
   },
   watch: {
     showData: function (newVal, oldVal) {
