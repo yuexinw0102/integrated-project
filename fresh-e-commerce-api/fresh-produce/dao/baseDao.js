@@ -30,6 +30,7 @@ class BaseDao {
     })
   }
 
+
   // 传入查询对象bean
   insert(bean) {
     const sql = `insert into ${this.table} set ?`; // 拼接sql命令

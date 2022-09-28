@@ -7,6 +7,7 @@
       text-color="#fff"
       active-text-color="#ffd04b"
       style="height: 100%"
+      :unique-opened=true
       router
     >
       <el-menu-item index="/welcome">

@@ -18,21 +18,47 @@
           :model="goodsSearchForm"
           class="goodsSearchForm"
         >
-          <el-row :gutter="30" class="demo-autocomplete searchFormRow">
+          <el-row :gutter="20" class="demo-autocomplete searchFormRow">
             <!-- 商品ID/商品标题/品种 -->
-            <el-col :span="8">
+            <el-col :span="3">
+              <el-form-item prop="classify_id">
+                <el-input
+                  class="inline-input"
+                  size="small"
+                  v-model="goodsSearchForm.classify_id"
+                  placeholder="商品ID"
+                  :trigger-on-focus="false"
+                  style="width: 100%"
+                >
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="3">
               <el-form-item prop="title">
                 <el-autocomplete
                   class="inline-input"
                   size="small"
                   v-model="goodsSearchForm.title"
                   :fetch-suggestions="querySearch"
-                  placeholder="商品ID/商品标题/品种"
+                  placeholder="商品标题"
                   :trigger-on-focus="false"
                   @select="handleSelect"
                   style="width: 100%"
                 >
                 </el-autocomplete>
+              </el-form-item>
+            </el-col>
+            <el-col :span="3">
+              <el-form-item prop="category">
+                <el-input
+                  class="inline-input"
+                  size="small"
+                  v-model="goodsSearchForm.category"
+                  placeholder="品种"
+                  :trigger-on-focus="false"
+                  style="width: 100%"
+                >
+                </el-input>
               </el-form-item>
             </el-col>
 
@@ -43,10 +69,10 @@
                   size="small"
                   v-model="goodsSearchForm.state"
                   filterable
+                  clearable
                   placeholder="商品状态"
                 >
                   <el-option :value="'已上架'"> </el-option>
-                  <el-option :value="'待上架'"> </el-option>
                   <el-option :value="'已下架'"> </el-option>
                 </el-select>
               </el-form-item>
@@ -59,6 +85,7 @@
                   size="small"
                   v-model="goodsSearchForm.store"
                   filterable
+                  clearable
                   placeholder="储存条件"
                 >
                   <el-option :value="'冷藏'"> </el-option>
@@ -86,10 +113,11 @@
                   size="small"
                   v-model="goodsSearchForm.unit"
                   filterable
+                  clearable
                   placeholder="kg"
                 >
-                  <el-option :value="'kg'"> </el-option>
                   <el-option :value="'g'"> </el-option>
+                  <el-option :value="'kg'"> </el-option>
                   <el-option :value="'mg'"> </el-option>
                 </el-select>
               </el-form-item>
@@ -103,6 +131,7 @@
                   size="small"
                   v-model="goodsSearchForm.classify"
                   filterable
+                  clearable
                   placeholder="商品分类"
                 >
                   <el-option :value="'蔬菜'"> </el-option>
@@ -171,6 +200,7 @@
           :data="showDatas"
           stripe
           border
+          v-loading="tableLoading"
           style="width: 100%"
           class="myTable"
         >
@@ -181,8 +211,16 @@
           <el-table-column prop="category" label="品种" width="140">
           </el-table-column>
           <el-table-column prop="store" label="储存条件" width="80">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.store == '1'">常温</el-tag>
+              <el-tag v-else-if="scope.row.store == '2'">冷冻</el-tag>
+              <el-tag v-else>冷藏</el-tag>
+            </template>
           </el-table-column>
-          <el-table-column prop="weight" label="规格/g" width="100">
+          <el-table-column prop="weight" label="规格/份" width="100">
+            <template slot-scope="scope">
+              {{ scope.row.weight + scope.row.unit }}
+            </template>
           </el-table-column>
           <el-table-column prop="classify" label="商品分类" width="100">
           </el-table-column>
@@ -193,6 +231,10 @@
           <el-table-column prop="nowPrice" label="商品现价" width="90">
           </el-table-column>
           <el-table-column prop="state" label="商品状态" width="90">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.state == '0'">已上架</el-tag>
+              <el-tag type="danger" v-else>已下架</el-tag>
+            </template>
           </el-table-column>
           <el-table-column label="操作" width="180">
             <template slot-scope="scope">
@@ -206,6 +248,7 @@
                 @click="handleTableDel(scope.$index, scope.row)"
                 type="text"
                 size="small"
+                slot="reference"
                 >立即下架</el-button
               >
             </template>
@@ -228,11 +271,13 @@
   import ContentView from "@/components/ContentView.vue";
   import Pagination from "@/components/Goods/GoodsProductPagination.vue";
   import product from "@/axios/goods/product.js"; // 请求后台数据
+  import __ from "lodash"; // 深拷贝引入lodash
   export default {
     name: "ProductList",
     data() {
       return {
         tableData: [], // 数据总数
+        tableLoading: true, // 加载动画
         searchListTotal: 0,
         page: {
           currentPage: 1, // 当前页码
@@ -259,6 +304,7 @@
     },
     mounted() {
       this.handleGetData();
+      this.tableLoading = false;
       // this.handleGetTestData();
       /* product.getAll().then(({ data }) => {
         this.tableData = data.data;
@@ -289,6 +335,11 @@
           } else if (this.tableData[i]) {
             tables.push(this.tableData[i]);
           }
+          tables.forEach((item, index) => {
+            if (typeof item == "undefined") {
+              tables.splice(index, 1);
+            }
+          });
           this.showDatas = tables;
         }
       });
@@ -330,6 +381,7 @@
 
       //  下架商品
       handleTableDel(index, row) {
+        if (!confirm("确定下架吗？")) return;
         console.log("下架商品", index, row);
         product
           .deleteById(row.id)
@@ -360,17 +412,34 @@
 
       //   查询按钮（搜索）
       handelSearch() {
+        console.log("handelSearch-this.goodsSearchForm-", this.goodsSearchForm);
+        let form = __.cloneDeep(this.goodsSearchForm); // 深拷贝
+        if (form.state == "已上架") {
+          form.state = "0";
+        } else if (form.state == "已下架") {
+          form.state = "1";
+        }
+
+        if (form.store == "冷藏") {
+          form.store = "0";
+        } else if (form.store == "常温") {
+          form.store = "1";
+        } else if (form.store == "冷冻") {
+          form.store = "2";
+        }
+
+        console.log("handelSearch-form-", form);
         product
-          .doSearch(this.goodsSearchForm)
+          .doSearch(form)
           .then(({ data }) => {
             if (data.status == "success") {
-              this.searchFlag = true;
+              // this.searchFlag = true;
               console.log("search data--", data);
               this.searchListTotal = data.data.length; // 查询后数据显示总数
               this.searchList = data.data; // 查询后的数据
               this.showDatas = this.searchList; // 查询后的数据
               this.setPageinations(this.searchList); // 设置分页数据
-              console.log("doSearch searchFlag--", this.searchFlag);
+              // console.log("doSearch searchFlag--", this.searchFlag);
               // bus.$emit("tableTotal", this.tableData.length);
             }
           })
@@ -383,7 +452,9 @@
 
       // '商品ID/商品标题/品种'搜索框相关方法开始
       querySearch(queryString, cb) {
+        console.log("querySearch", queryString);
         var searchRes = this.searchRes;
+        console.log("searchRes", searchRes);
         var results = queryString
           ? searchRes.filter(this.createFilter(queryString))
           : searchRes;
@@ -399,7 +470,7 @@
       },
       loadAll() {
         return [
-          { value: "三全鲜食（北新泾店）", address: "长宁区新渔路144号" },
+          { value: "车厘子", address: "长宁区新渔路144号" },
           {
             value: "Hot honey 首尔炸鸡（仙霞路）",
             address: "上海市长宁区淞虹路661号",
@@ -433,7 +504,7 @@
         ];
       },
       handleSelect(item) {
-        console.log(item);
+        console.log("handleSelect item--", item);
       },
       // '商品ID/商品标题/品种'搜索框相关方法结束
     },

@@ -331,6 +331,12 @@
           } else if (this.tableData[i]) {
             tables.push(this.tableData[i]);
           }
+          tables.forEach((item, index) => {
+            console.log(typeof item == "undefined");
+            if (typeof item == "undefined") {
+              tables.splice(index, 1);
+            }
+          });
           this.showDatas = tables;
         }
       });

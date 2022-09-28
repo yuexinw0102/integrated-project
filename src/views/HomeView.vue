@@ -44,6 +44,9 @@
       }
     }
   }
+  #root{
+    height: 100%;
+  }
   #root > .el-header,
   .el-footer {
     background-color: #b3c0d1;

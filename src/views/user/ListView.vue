@@ -269,6 +269,11 @@
           } else if (this.tableData[i]) {
             tables.push(this.tableData[i]);
           }
+          tables.forEach((item, index) => {
+            if (typeof item == "undefined") {
+              tables.splice(index, 1);
+            }
+          });
           this.showDatas = tables;
         }
       });
@@ -357,7 +362,7 @@
                   this.showDatas = this.searchList; // 查询后的数据
                   this.setPageinations(this.searchList); // 设置分页数据
                 })
-                .catch((err) => this.$message.error("查询失败"));
+                .catch((err) => {});
               console.log("search data--", data);
               this.searchListTotal = data.data.length; // 查询后数据显示总数
               this.searchList = data.data; // 查询后的数据
@@ -398,7 +403,7 @@
             address: "上海市长宁区淞虹路661号",
           },
           {
-            value: "新旺角茶餐厅",
+            value: "哈哈",
             address: "上海市普陀区真北路988号创邑金沙谷6号楼113",
           },
           { value: "泷千家(天山西路店)", address: "天山西路438号" },

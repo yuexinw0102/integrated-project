@@ -83,9 +83,11 @@ import {
   Notification,
   Drawer,
   Tag,
+  Popconfirm,
 } from "element-ui";
 
 
+Vue.use(Popconfirm);
 Vue.use(Tag);
 Vue.use(Drawer);
 Vue.use(Pagination);
