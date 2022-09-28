@@ -27,13 +27,4 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "Content",
-  data() {
-    return {
-      menuTitle: sessionStorage.getItem("menuTitle"),
-    };
-  },
-};
-</script>
+<script></script>

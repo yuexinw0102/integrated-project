@@ -1,18 +1,21 @@
 <template>
   <ContentView>
+     <!-- 面包屑插槽 -->
+     <template v-slot:breadcrumb>
+      <el-card shadow="never">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item>仓库管理</el-breadcrumb-item>
+        </el-breadcrumb>
+      </el-card>
+    </template>
     <template #searchForm>
-      <span>仓库管理</span>
-
       <Search_box style="height:auto"></Search_box>
-
     </template>
     <template #dataTable>
-
       <Table_area style="margin-bottom:5px;"></Table_area>
     </template>
-
     <template v-slot:pagination>
-      
       <Pagination></Pagination>
     </template>
   </ContentView>

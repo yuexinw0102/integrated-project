@@ -6,15 +6,15 @@ Vue.use(Vuex)
 
 export const NAMES = {
   set_token: "set_token",
-  set_warehouseDataId: "set_warehouseDataId",
+  set_warehouseEditor: "set_warehouseEditor",
   token: "token",
-  warehouseDataId: "warehouseDataId",
+  warehouseEditor: "warehouseEditor",
 }
 
 export default new Vuex.Store({
   state: {
     token: "",
-    warehouseDataId: '',
+    warehouseEditor:'',
   },
   getters: {
   },
@@ -22,8 +22,8 @@ export default new Vuex.Store({
     [NAMES.set_token](state, payload) {
       state.token = payload.tokenHeader+payload.token;
     },
-    [NAMES.set_warehouseDataId](state, payload) {
-      state.warehouseDataId = payload;
+    [NAMES.set_warehouseEditor](state, payload) {
+      state.warehouseEditor = payload;
     },
   },
   actions: {

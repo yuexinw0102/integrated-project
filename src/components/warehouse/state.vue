@@ -1,8 +1,5 @@
 <template>
   <el-card class="box-card">
-    <div slot="header" class="clearfix">
-      <span>仓库管理 > {{ warehouseEditor }}</span>
-    </div>
     <div class="text item">
       <el-form ref="form" :rules="rules" :model="form" label-width="auto">
         <!-- 仓库名称 -->
@@ -270,6 +267,8 @@ import warehouse from "@/axios/warehouse";
 import warehouseRider from "@/axios/warehouseRider";
 import warehouseSorting from "@/axios/warehouseSorting";
 import warehouseCommunity from "@/axios/warehouseCommunity";
+import { mapMutations } from "vuex";
+import { NAMES } from "@/store";
 export default {
   name: "AbsencesAddOrEdit",
   data() {
@@ -391,9 +390,11 @@ export default {
     } else {
       this.warehouseEditor = "仓库详情";
     }
+    this[NAMES.set_warehouseEditor](this.warehouseEditor)
   },
   mounted() {},
   methods: {
+    ...mapMutations([NAMES.set_warehouseEditor]),
     back() {
       this.$router.push("/warehouse");
     },

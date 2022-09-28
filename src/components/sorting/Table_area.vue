@@ -1,6 +1,10 @@
 <template>
   <el-row>
     <el-col>
+      <p>
+        <span>{{ waiting | Waiting }}</span>
+        <span>{{ already | Already }}</span>
+      </p>
       <el-table
         :data="
           showData.slice(
@@ -10,13 +14,14 @@
         "
         border
         style="width: 100%; overflow: auto"
-        height="500"
+        height="430"
       >
         <el-table-column prop="id" label="订单编号"> </el-table-column>
         <el-table-column prop="time" label="下单时间"> </el-table-column>
         <el-table-column prop="quantity" label="商品数量"> </el-table-column>
         <el-table-column prop="sortingTime" label="分拣时长"> </el-table-column>
-        <el-table-column prop="sortingState" label="分拣状态"> </el-table-column>
+        <el-table-column prop="sortingState" label="分拣状态">
+        </el-table-column>
         <el-table-column prop="sorting" label="分拣员"> </el-table-column>
         <el-table-column prop="city" label="所在城市"> </el-table-column>
         <el-table-column prop="area" label="所在区域"></el-table-column>
@@ -33,8 +38,6 @@
 </style>
 <script>
 import bus from "@/eventBus/eventBus";
-import { mapMutations } from "vuex";
-import { NAMES } from "@/store";
 import warehouse from "@/axios/warehouse";
 import order from "@/axios/order";
 import warehouseSorting from "@/axios/warehouseSorting";
@@ -43,6 +46,8 @@ export default {
     return {
       tableData: [],
       showData: [],
+      waiting: "",
+      already: "",
       page: {
         page_size: 10,
         page_num: 1,
@@ -61,11 +66,15 @@ export default {
     ) {
       this.tableData = data.data.data;
       this.showData = this.tableData;
+      let already = [];
+      let waiting = [];
       this.showData.forEach((item) => {
         if (item.sortingState == "1") {
           item.sortingState = "已分拣";
+          already.push(item);
         } else if (item.sortingState == "0") {
           item.sortingState = "未分拣";
+          waiting.push(item);
         }
         data1.data.data.forEach((item1) => {
           if (item.warehouseId == item1.id) {
@@ -79,7 +88,11 @@ export default {
             item.sorting = item1.name;
           }
         });
+        const moment = require("moment");
+        item.time = moment(item.time).format("Y-MM-DD HH:mm:ss");
       });
+      this.already = already.length;
+      this.waiting = waiting.length;
     }
   },
   mounted() {
@@ -102,6 +115,14 @@ export default {
       if (newVal != oldVal) {
         bus.$emit("warehouse_get_count", this.showData.length);
       }
+    },
+  },
+  filters: {
+    Waiting(value) {
+      return "待分拣（" + value + "） ";
+    },
+    Already(value) {
+      return "已分拣（" + value + "） ";
     },
   },
 };
