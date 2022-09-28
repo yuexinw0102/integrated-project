@@ -4,12 +4,17 @@ const table = 'goodsproduct';
 // sql命令配置
 function getConfig() {
   return {
-    id: {
+    classify_id: {
       type: 'like',
       prefix: '%', // 前缀
       suffix: '%', // 后缀
     },
     title: {
+      type: 'like',
+      prefix: '%', // 前缀
+      suffix: '%', // 后缀
+    },
+    category: {
       type: 'like',
       prefix: '%', // 前缀
       suffix: '%', // 后缀

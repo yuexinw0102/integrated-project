@@ -1,12 +1,13 @@
 <template>
   <el-col style="height: 100%">
     <el-menu
-      default-active="/welcome"
+      :default-active=this.$route.path
       class="el-menu-vertical-demo"
       background-color="#545c64"
       text-color="#fff"
       active-text-color="#ffd04b"
       style="height: 100%"
+      :unique-opened=true
       router
     >
       <el-menu-item index="/welcome">

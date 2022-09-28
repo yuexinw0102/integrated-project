@@ -1,7 +1,11 @@
 <template>
   <el-card shadow="never">
     <div slot="header" class="clearfix">
-      <span>商品列表 > 商品详情</span>
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item :to="{ path: '/product_list' }">商品管理</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/product_list' }">商品列表</el-breadcrumb-item>
+          <el-breadcrumb-item>商品详情</el-breadcrumb-item>
+        </el-breadcrumb>
     </div>
     <el-form ref="form" :model="form" label-width="80px">
       <el-form-item label="商品标题">
@@ -131,24 +135,24 @@
               list-type="picture-card"
               class="avatar-uploader"
               action="http://localhost:3000/upload"
-              :on-success="handleImgSuccess"
+              :on-success="handleSShowSuccess"
               :before-upload="beforeSlideShowUpload"
+              :headers="headersObj"
+              :limit="1"
             >
-              <img
-                v-if="form.slideShowImgUrl"
-                :src="form.slideShowImgUrl"
-                class="avatar"
-              />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <i class="el-icon-plus"></i>
+
+              <template #tip>
+                <div style="font-size: 12px; color: #919191">
+                  只能上传.jpg/png文件，且不超过2M
+                </div>
+              </template>
             </el-upload>
             <el-dialog
-              v-if="goodsSlideShow"
+              v-if="goodsSlideShow.slideShowUrl"
               :visible.sync="goodsSlideShow.dialogVisible"
             >
-              <img width="100%" :src="form.slideShowImgUrl" alt="" />
-              <!-- <div slot="tip" class="el-upload__tip">
-              只能上传jpg/png文件，且不超过500kb
-            </div> -->
+              <img width="100%" :src="form.slideShowUrl" alt="" />
             </el-dialog>
           </el-form-item>
         </el-col>
@@ -157,9 +161,12 @@
         <el-col>
           <el-form-item label="详情页图">
             <el-upload
-              action="/add.do"
+              action="http://localhost:3000/upload"
               list-type="picture-card"
-              :auto-upload="false"
+              :on-success="handleDetailSuccess"
+              :before-upload="beforeSlideShowUpload"
+              :headers="headersObj"
+              :limit="1"
             >
               <i slot="default" class="el-icon-plus"></i>
               <div slot="file" slot-scope="{ file }">
@@ -193,7 +200,7 @@
               </div>
               <template #tip>
                 <div style="font-size: 12px; color: #919191">
-                  只能上传.jpg/png文件，且不超过500kb
+                  只能上传.jpg/png文件，且不超过2M
                 </div>
               </template>
             </el-upload>
@@ -201,10 +208,7 @@
               v-if="goodsDetailPage"
               :visible.sync="goodsDetailPage.dialogVisible"
             >
-              <img width="100%" :src="form.slideShowImgUrl" alt="" />
-              <!-- <div slot="tip" class="el-upload__tip">
-              只能上传jpg/png文件，且不超过500kb
-            </div> -->
+              <img width="100%" :src="goodsDetailPage.slideShowUrl" alt="" />
             </el-dialog>
           </el-form-item>
         </el-col>
@@ -275,7 +279,9 @@
           @click="handleSubmit"
           >{{ loading ? "提交中 ..." : "保存资料" }}</el-button
         >
-        <el-button size="small" type="primary">商品下架</el-button>
+        <el-button size="small" type="primary" v-if="editIndex"
+          >商品下架</el-button
+        >
       </el-row>
     </el-form>
   </el-card>
@@ -285,14 +291,14 @@
   //@click="handleSubmit"
   import product from "@/axios/goods/product";
   import uploads from "@/axios/goods/uploads";
-  import { mapMutations, mapState } from "vuex";
-  import { NAMES } from "@/store"; // 取出token
-  // import slideShow from "@/axios/goods/productSlideShow";
+  import slidePic from "@/axios/goods/slidePic";
+  // import { mapMutations, mapState } from "vuex";
+  // import { NAMES } from "@/store"; // 取出token
+
   export default {
     name: "ProductAddOrEdit",
     created() {
       console.log("headersObj", this.headersObj);
-      console.log("NAME.token", this[NAMES.token]);
       product
         .search()
         .then(({ data }) => {
@@ -303,7 +309,7 @@
             item.id = parseInt(item.id);
             id_list.push(item.id);
           });
-          this.maxId = Math.max(...id_list); // 获取最大索引值
+          this.maxId = Math.max(...id_list); // 获取最大id值
           this.editIndex = this.$route.query.id;
           if (this.editIndex) {
             // console.log("id", this.editIndex);
@@ -326,6 +332,16 @@
           console.log("search err", err);
           return this.$message.error("请求所有数据失败！");
         });
+
+      slidePic.search().then(({ data }) => {
+        let id_list = [];
+        console.log("search data", data);
+        data.data.forEach(item => {
+            item.id = parseInt(item.id);
+          id_list.push(item.id);
+        })
+        this.goodsSlideShow.id = Math.max(...id_list); // 获取最大id值
+       })
     },
     props: {
       id: {
@@ -352,8 +368,6 @@
           classify: "",
           nowPrice: "",
           originalPrice: "",
-          slideShowImgUrl: [], // 存放商品轮播图url
-          detailPageImgUrl: [], // 存放商品详情页图url
           isFlashSale: "", // 限时抢购
           flashSalePrice: "", // 抢购价格
           startDate: "", // 开始抢购时间
@@ -363,17 +377,20 @@
         },
         // 设置请求头存放token
         headersObj: {
-          Authorization: JSON.parse(sessionStorage.getItem("token")).token,
+          Authorization: JSON.parse(sessionStorage.getItem("token")),
         },
         // 存放商品轮播图
         goodsSlideShow: {
-          // dialogImageUrl: "",
+          id: 0,
+          goodsId: "",
+          slideShowUrl: [], // 存放商品轮播图url
           dialogVisible: false,
           disabled: false,
         },
         //   存放商品详情页图
         goodsDetailPage: {
-          // dialogImageUrl: "",
+          goodsId: "",
+          detailPageImgUrl: [], // 存放商品详情页图url
           dialogVisible: false,
           disabled: false,
         },
@@ -381,12 +398,12 @@
         timer: null,
       };
     },
-    computed: {
-      ...mapState([NAMES.token]),
-    },
+    // computed: {
+    //   ...mapState([NAMES.token]),
+    // },
     methods: {
       handleSubmit(done) {
-        console.log("handleSubmit done", done);
+        console.log("add form--", this.form);
         this.$confirm("确定要提交吗？")
           .then((_) => {
             this.loading = true;
@@ -395,7 +412,7 @@
               setTimeout(() => {
                 this.loading = false;
                 if (this.editIndex) {
-                  console.log("this.form--", this.form);
+                  // console.log("this.form--", this.form);
                   product.edit(this.form).then(({ data }) => {
                     console.log("edit data--", data);
                     // alert(data.message);
@@ -410,13 +427,15 @@
                   });
                 } else {
                   this.form.id = parseInt(this.maxId) + 1;
+                  let id = this.form.id;
                   console.log("add form--", this.form);
                   product.add(this.form).then(({ data }) => {
-                    uploads
-                      .upload(this.form.slideShowImgUrl)
+                    /* uploads
+                      .upload(this.form.slideShowUrl)
                       .then(({ data }) => {
                         console.log("upload data--", data);
-                      });
+                      }); */
+
                     console.log("add data--", data);
                     // alert(data.message);
                     if (data.status == "success") {
@@ -424,17 +443,32 @@
                         message: data.message,
                         type: "success",
                       });
+                      // 上传轮播图
+                      this.goodsSlideShow.goodsId = id; // 商品id值
+                      this.goodsSlideShow.id += 1; // 主键id
+                      delete this.goodsSlideShow.dialogVisible;
+                      delete this.goodsSlideShow.disabled;
+                      slidePic
+                        .addSlidePic(this.goodsSlideShow)
+                        .then(({ data }) => {
+                          console.log(
+                            "slidePic this.goodsSlideShow-",
+                            this.goodsSlideShow
+                          );
+                          console.log("addSlidePic data-", data);
+                          if (data.status == "success") {
+                            this.$message({
+                              message: data.message,
+                              type: "success",
+                            });
+                          } else {
+                            this.$message.error(data.message);
+                          }
+                        }).catch(err => this.$message.error("商品轮播图上传失败"));
                     } else {
-                      this.$message.error("添加失败");
+                      this.$message.error(data.message);
                     }
                   });
-                  /*  console.log(this.goodsSlideShow);
-                  slideShow
-                    .add(this.form)
-                    .then(({ data }) => {
-                      console.log("slideShow data", data);
-                    })
-                    .catch(() => {}); */
                 }
                 this.$router.back(); // 编辑之后回退页面
               }, 400);
@@ -464,12 +498,12 @@
         const ext = file.name.substring(file.name.lastIndexOf(".") + 1);
         console.log("ext", ext);
         const extension =
-          ext === ".jpg" ||
-          ext === ".JPG" ||
-          ext === ".jpeg" ||
-          ext === ".JPEG" ||
-          ext === ".png" ||
-          ext === ".PNG";
+          ext === "jpg" ||
+          ext === "JPG" ||
+          ext === "jpeg" ||
+          ext === "JPEG" ||
+          ext === "png" ||
+          ext === "PNG";
         const isLt2M = file.size / 1024 / 1024 < 7; // 不超过2M
         if (!extension) {
           this.$message({
@@ -479,25 +513,28 @@
           return false;
         }
         console.log(file);
-        // if (!isLt2M) {
-        //   this.$message({
-        //     type: "error",
-        //     message: "上传文件的大小不超过 2M",
-        //   });
-        //   return false;
-        // }
+        if (!isLt2M) {
+          this.$message({
+            type: "error",
+            message: "上传文件的大小不超过 2M",
+          });
+          return false;
+        }
         return extension || isLt2M;
       },
-      // 监听上传成功的函数
-      handleImgSuccess(response, file, fileList) {
-        console.log("handleImgSuccess response", response);
-        console.log("handleImgSuccess file", file);
+
+      // 监听轮播图上传成功的函数
+      handleSShowSuccess(response, file, fileList) {
+        console.log("handleSShowSuccess response", response.data);
+        console.log("handleSShowSuccess file", file);
+        console.log("handleSShowSuccess fileList", fileList);
         const imgInfo = {
           name: file.name, // 参考elementUI属性 file-list
-          url: response.data.tmp_path, // 临时路径
+          url: response.url, // 临时路径
         };
-        // this.form.slideShowImgUrl.push(imgInfo); // 存入数组
-        this.form.slideShowImgUrl = URL.createObjectURL(file.raw);
+        console.log("handleSShowSuccess imgInfo", imgInfo);
+        this.goodsSlideShow.slideShowUrl = imgInfo.url; // 存入url
+        console.log("监听图片上传之后的 goodsSlideShow", this.goodsSlideShow);
       },
 
       //   上传商品轮播图相关方法
@@ -509,7 +546,7 @@
         // 预览图片
         console.log(this.goodsSlideShow);
         console.log(file);
-        this.form.slideShowImgUrl = file.url; // 报错
+        this.goodsSlideShow.slideShowUrl = file.url; // 报错
         this.goodsSlideShow.dialogVisible = true;
       },
       handleDownload(file) {
@@ -517,18 +554,29 @@
         console.log(file);
       },
 
+      // 监听详情页图上传成功的函数
+      handleDetailSuccess() {
+        console.log("handleDetailSuccess response", response);
+        console.log("handleDetailSuccess file", file);
+        const imgInfo = {
+          name: file.name, // 参考elementUI属性 file-list
+          url: response.data.tmp_path, // 临时路径
+        };
+        this.goodsDetailPage.detailPageImgUrl.push(imgInfo); // 存入数组
+      },
+
       //   上传商品详情页图相关方法
       handleDetailPageRemove(file) {
         console.log(file);
       },
       handleDetailPagePictureCardPreview(file) {
-        this.form.slideShowImgUrl = file.url;
-        this.form.goodsDetailPage.dialogVisible = true;
+        this.goodsDetailPage.slideShowUrl = file.url;
+        this.goodsDetailPage.dialogVisible = true;
       },
       handleDetailPageDownload(file) {
         console.log(file);
       },
-      ...mapMutations([NAMES.set_token]),
+      // ...mapMutations([NAMES.set_token]),
     },
   };
 </script>
@@ -553,8 +601,8 @@
     text-align: center;
   }
   .avatar {
-    width: 178px;
-    height: 178px;
+    width: 146px;
+    height: 146px;
     display: block;
   }
 </style>

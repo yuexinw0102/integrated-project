@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 })
 // 生成multer对象
 const upload = multer({
-  dest: 'tmp_uploads', // 临时上传目录
+  dest: 'tmp_uploads/', // 临时上传目录
   storage
 });
 
@@ -43,9 +43,7 @@ const upload_config = require('config').get('upload_config');
 router.post("/", upload.single('file'), function (req, res, next) {
   console.log("Upload req.file", req.file)
   const fileExtArray = req.file.originalname.split(".");// 以点分隔
-  console.log('fileExtArray', fileExtArray)
   const ext = fileExtArray[fileExtArray.length - 1];
-  console.log('ext', ext)
   const targetPath = req.file.path + "." + ext; // 拼接目标路径
  /*  console.log('req.file...', req.file);
   console.log("保存到数据库的路径是：", path.join(subFolder, path.basename(req.file.path))); */
