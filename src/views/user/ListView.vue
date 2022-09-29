@@ -205,8 +205,6 @@
 </template>
 
 <script>
-  // searchList.length != 0 ? searchList.length : tableData.length 
-  import axios from "axios";
   import bus from "@/eventBus/eventBus.js"; // 引入兄弟组件传值中间件
   import ContentView from "@/components/ContentView.vue";
   import Pagination from "@/components/Goods/GoodsProductPagination.vue";

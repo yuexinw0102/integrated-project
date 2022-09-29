@@ -14,6 +14,13 @@ export default new (class {
       params: form
     });
   }
+  
+  find(form) {
+    console.log("find--", form);
+    return $http.get(`${suffix}/find.do`, {
+      params: form
+    });
+  }
 
   getById(id) { 
     return $http.get(`${suffix}/getById.do`, {

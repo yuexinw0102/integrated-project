@@ -163,6 +163,11 @@
           <el-table-column prop="classifyName" label="分类名称" width="311">
           </el-table-column>
           <el-table-column prop="tier" label="层级" width="313">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.tier == '1'">二级</el-tag>
+              <el-tag v-else-if="scope.row.tier == '2'">三级</el-tag>
+              <el-tag v-else>一级</el-tag>
+            </template>
           </el-table-column>
           <el-table-column prop="superior" label="所属上级" width="310">
           </el-table-column>
@@ -332,7 +337,6 @@
             tables.push(this.tableData[i]);
           }
           tables.forEach((item, index) => {
-            console.log(typeof item == "undefined");
             if (typeof item == "undefined") {
               tables.splice(index, 1);
             }
