@@ -107,31 +107,7 @@ const routes = [
           import(
             /* webpackChunkName: "about" */ "../views/distribution/ListView.vue"
           ),
-      },
-      {
-        path: "/role",
-        name: "role",
-        component: () =>
-          import(
-            /* webpackChunkName: "about" */ "../views/limits/role/ListView.vue"
-          ),
-      },
-      {
-        path: "/department",
-        name: "department",
-        component: () =>
-          import(
-            /* webpackChunkName: "about" */ "../views/limits/department/ListView.vue"
-          ),
-      },
-      {
-        path: "/account",
-        name: "account",
-        component: () =>
-          import(
-            /* webpackChunkName: "about" */ "../views/limits/account/ListView.vue"
-          ),
-      },
+      }
     ],
   },
 ];
@@ -153,7 +129,6 @@ router.beforeEach((to, from, next) => {
       next();
     }
   }
-  // next();
 });
 
 export default router;

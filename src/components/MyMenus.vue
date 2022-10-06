@@ -49,17 +49,6 @@
         <i class="el-icon-truck"></i>
         <span slot="title">配送监控</span>
       </el-menu-item>
-      <el-submenu index="3">
-        <template slot="title">
-          <i class="el-icon-s-tools"></i>
-          <span>权限中心</span>
-        </template>
-        <el-menu-item-group>
-          <el-menu-item index="/role">角色管理</el-menu-item>
-          <el-menu-item index="/department">部门管理</el-menu-item>
-          <el-menu-item index="/account">账号管理</el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
     </el-menu>
   </el-col>
 </template>

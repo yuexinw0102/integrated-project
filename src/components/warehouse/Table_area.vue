@@ -96,6 +96,7 @@ export default {
       },
     };
   },
+  //获取数据
   async created() {
     let data = await warehouse.search();
     let data1 = await warehouse.searchCommunity();
