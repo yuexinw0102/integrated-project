@@ -34,6 +34,22 @@ router.get('/getByPage.do', async (req, res, next) => {
   }
 })
 
+// 范围查询
+router.get('/find.do', async (req, res, next) => {
+  try {
+    const result = await dao.find(req.query);
+    // const total = await dao.findCount(req.query);
+    res.json({
+      status: 'success',
+      data: result,
+    })
+  } catch (err) {
+    console.log(err);
+    res.locals.err = err;
+    next();
+  }
+})
+
 
 // 定义删除数据验证规则
 const rulesGetById = [

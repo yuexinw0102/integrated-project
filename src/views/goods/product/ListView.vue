@@ -123,7 +123,7 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-row :gutter="30" class="searchFormRow">
+          <el-row :gutter="20" class="searchFormRow">
             <!-- 商品分类 -->
             <el-col :span="3">
               <el-form-item prop="classify">
@@ -134,36 +134,61 @@
                   clearable
                   placeholder="商品分类"
                 >
-                  <el-option :value="'蔬菜'"> </el-option>
-                  <el-option :value="'水果'"> </el-option>
-                  <el-option :value="'零食'"> </el-option>
+                  <el-option label="新鲜蔬果" value="新鲜蔬果"></el-option>
+                  <el-option label="休闲零食" value="休闲零食"></el-option>
+                  <el-option label="肉禽蛋" value="肉禽蛋"></el-option>
+                  <el-option label="酒水乳饮" value="酒水乳饮"></el-option>
+                  <el-option label="粮油调味" value="粮油调味"></el-option>
+                  <el-option label="品牌家电" value="品牌家电"></el-option>
+                  <el-option label="美妆个护" value="美妆个护"></el-option>
+                  <el-option label="个人百货" value="个人百货"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
 
             <!-- 商品现价 -->
-            <el-col :span="8">
-              <el-form-item prop="nowPrice">
+            <el-col :span="4">
+              <el-form-item prop="nowPrice1">
                 <el-input
                   size="small"
-                  v-model.number="goodsSearchForm.nowPrice"
-                  placeholder="请输入商品现价"
+                  v-model.number="goodsSearchForm.nowPrice1"
+                  placeholder="请输入最低商品现价"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="1" id="s-line">-</el-col>
+            <el-col :span="4">
+              <el-form-item prop="nowPrice2">
+                <el-input
+                  size="small"
+                  v-model.number="goodsSearchForm.nowPrice2"
+                  placeholder="请输入最高商品现价"
                 ></el-input>
               </el-form-item>
             </el-col>
 
             <!-- 商品原价 -->
-            <el-col :span="8">
-              <el-form-item prop="originalPrice">
+            <el-col :span="4">
+              <el-form-item prop="originalPrice1">
                 <el-input
                   size="small"
-                  v-model.number="goodsSearchForm.originalPrice"
-                  placeholder="请输入商品原价"
+                  v-model.number="goodsSearchForm.originalPrice1"
+                  placeholder="请输入最低商品原价"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="1" id="s-line">-</el-col>
+            <el-col :span="4">
+              <el-form-item prop="originalPrice2">
+                <el-input
+                  size="small"
+                  v-model.number="goodsSearchForm.originalPrice2"
+                  placeholder="请输入最高商品原价"
                 ></el-input>
               </el-form-item>
             </el-col>
 
-            <el-col class="search-btn-col" :span="5">
+            <el-col class="search-btn-col" :span="3">
               <el-button size="small" @click="handelSearch" type="primary"
                 >查询</el-button
               >
@@ -266,7 +291,6 @@
 </template>
 
 <script>
-  // searchList.length != 0 ? searchList.length : tableData.length
   import bus from "@/eventBus/eventBus.js"; // 引入兄弟组件传值中间件
   import ContentView from "@/components/ContentView.vue";
   import Pagination from "@/components/Goods/GoodsProductPagination.vue";
@@ -293,8 +317,10 @@
           weighit: "",
           unit: "",
           classify: "",
-          nowPrice: "",
-          originalPrice: "",
+          nowPrice1: "", // 最低现价
+          nowPrice2: "",
+          originalPrice1: "", // 最低原价
+          originalPrice2: "",
         },
         searchFlag: false, // 是否开始搜索,控制分页
         searchList: [], // 存放搜索数据
@@ -305,10 +331,6 @@
     mounted() {
       this.handleGetData();
       this.tableLoading = false;
-      // this.handleGetTestData();
-      /* product.getAll().then(({ data }) => {
-        this.tableData = data.data;
-      }) */
       bus.$on("sizeChange", (val) => {
         this.page.pageSize = val;
         this.page.currentPage = 1; // size变化时页码置为1
@@ -346,9 +368,6 @@
       // '商品ID/商品标题/品种'搜索框相关
       this.searchRes = this.loadAll();
     },
-    // updated() {
-    //   console.log("Searching", this.searchList);
-    // },
     methods: {
       // 获取表格数据
       handleGetData() {
@@ -413,6 +432,7 @@
       //   查询按钮（搜索）
       handelSearch() {
         console.log("handelSearch-this.goodsSearchForm-", this.goodsSearchForm);
+
         let form = __.cloneDeep(this.goodsSearchForm); // 深拷贝
         if (form.state == "已上架") {
           form.state = "0";
@@ -435,6 +455,16 @@
             if (data.status == "success") {
               // this.searchFlag = true;
               console.log("search data--", data);
+              product
+                .find(form)
+                .then(({ data }) => {
+                  console.log("find data--", data);
+                  this.searchListTotal = data.data.length; // 查询后数据显示总数
+                  this.searchList = data.data; // 查询后的数据
+                  this.showDatas = this.searchList; // 查询后的数据
+                  this.setPageinations(this.searchList); // 设置分页数据
+                })
+                .catch((err) => {});
               this.searchListTotal = data.data.length; // 查询后数据显示总数
               this.searchList = data.data; // 查询后的数据
               this.showDatas = this.searchList; // 查询后的数据
@@ -445,7 +475,7 @@
           })
           .catch((err) => {
             console.log("search err--", err);
-            this.$message.error("error error搜索失败！");
+            this.$message.error("error 搜索失败！");
           });
         // this.searchFlag = false; // 关闭搜索开关
       },
@@ -561,6 +591,12 @@
   }
   .search-btn-col {
     margin-top: 5px;
+  }
+  /deep/#s-line {
+    width: 7px;
+    padding: 0;
+    text-align: center;
+    line-height: 40px;
   }
   // 搜索部分结束
 </style>

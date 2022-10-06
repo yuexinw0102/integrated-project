@@ -145,7 +145,7 @@ class BaseDao {
       const isOr = item['isOr'];
 
       if (index > 0) {
-        where += isOr ? ' or ' : 'and';
+        where += isOr ? ' or ' : ' and ';
       } else {
         where += ' where ';
       }
