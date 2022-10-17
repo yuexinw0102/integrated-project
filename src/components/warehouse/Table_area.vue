@@ -155,7 +155,9 @@ export default {
       this.$router.replace({ path: "/new_warehouse", query: { id: id } });
     },
     state({ row, rowIndex }) {
-      if (row.state === 0) {
+      // console.log("12",row);
+      if (row.state == 0) {
+        console.log("12",row);
         return "warning-row";
       }
     },

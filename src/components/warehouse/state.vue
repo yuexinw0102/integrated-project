@@ -526,7 +526,7 @@ export default {
 
     //停用与启用
     state({ row, rowIndex }) {
-      if (row.state === 0) {
+      if (row.state == 0) {
         return "warning-row";
       }
     },
