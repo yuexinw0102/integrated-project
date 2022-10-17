@@ -39,7 +39,7 @@ app.use(expressjwt({
   algorithms: ['HS256']
   // 白名单
 }).unless({
-  path: ["/login.do", "/logout.do"]
+  path: ["/login.do","/user/getAll.do"]
 }));
 
 
@@ -50,29 +50,22 @@ const rules = [
 ];
 app.use(...rules, function (req, res, next) {
   console.log("当前请求地址", req.url);
-  // console.log("get请求参数", req.query);
-  // console.log("post请求参数", req.body);
-
-  // const { page_size, page_num } = req.query;
-  // pager.page_size = page_size ? page_size : 10;
-  // pager.page_num = page_num ? page_num : 1;
-  // console.log("app pager", pager.page_num, pager.page_size);
   next();
 })
 
 // 路由中间件
 app.use('/', require('./routes/loginRouter.js'));
-app.use('/user', require('./routes/userRouter.js'));
 app.use('/goodsProduct', require('./routes/goodsProductRouter'));
 app.use('/goodsClassify', require('./routes/classifyRouter'));
 app.use('/productSlideShow', require('./routes/productSlideShowRouter'));
-app.use('/upload', require('./routes/uploadRouter'));
-app.use('/orders', require('./routes/ordersRouter.js'));
+app.use('/warehouse', require('./routes/warehouseRouter'));
+app.use('/warehouseRider', require('./routes/warehouseRiderRouter'));
+app.use('/warehouseSortingRouter', require('./routes/warehouseSortingRouter'));
+app.use('/warehouseCommunityRouter', require('./routes/warehouseCommunityRouter'));
+app.use('/orderRouter', require('./routes/orderRouter'));
+app.use('/user', require('./routes/userRouter.js'));
 
 
-// 富文本空间地址
-app.use("/tmp_uploads", express.static("tmp_uploads"));
-app.use("/upload/goodsSlideShow", express.static("upload/goodsSlideShow"));
 
 // 统一错误处理
 app.use((req, res) => {

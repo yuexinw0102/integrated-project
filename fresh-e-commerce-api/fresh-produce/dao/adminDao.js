@@ -6,12 +6,6 @@ class AdminDao extends BaseDao {
     super(table, primaryKey);
   }
 
-  findByPage(args) {
-    const baen = {
-      
-    }
-  }
-
   login({ account, password }) {
     const bean = {
       where: 'where account = ? and password = ?',

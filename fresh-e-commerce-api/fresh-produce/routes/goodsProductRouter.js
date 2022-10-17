@@ -34,22 +34,6 @@ router.get('/getByPage.do', async (req, res, next) => {
   }
 })
 
-// 范围查询
-router.get('/find.do', async (req, res, next) => {
-  try {
-    const result = await dao.find(req.query);
-    // const total = await dao.findCount(req.query);
-    res.json({
-      status: 'success',
-      data: result,
-    })
-  } catch (err) {
-    console.log(err);
-    res.locals.err = err;
-    next();
-  }
-})
-
 
 // 定义删除数据验证规则
 const rulesGetById = [
@@ -133,7 +117,7 @@ router.post('/add.do', ...rules, async (req, res, next) => {
     console.log('add req.body: ', req.body);
     res.json({
       status: result > 0 ? 'success' : 'error',
-      message: result > 0 ? '商品添加成功' : '商品添加失败',
+      message: result > 0 ? '添加成功' : '添加失败',
       insertId: result > 0 ? insertId : 0,
     })
   } catch (err) {

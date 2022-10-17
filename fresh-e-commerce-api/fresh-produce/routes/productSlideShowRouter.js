@@ -88,9 +88,11 @@ router.get('/deleteById.do', ...rulesDel, async (req, res, next) => {
 
 // 定义添加/编辑验证规则
 const rules = [
-  body('id').trim().exists().withMessage('id属性必填').bail(),
-  body('slideShowUrl').trim().exists().withMessage('slideShowUrl属性必填').bail(),
-  body('goodsId').toInt().optional()
+  body('title').trim().exists().withMessage('title属性必填').bail(),
+  body('variety').trim().exists().withMessage('variety属性必填').bail(),
+  body('state').trim().exists().withMessage('state属性必填').bail(),
+  body('isRecommend').trim().exists().withMessage('isRecommend属性必填').bail(),
+  body('id').toInt().optional()
 ];
 // 添加
 router.post('/add.do', ...rules, async (req, res, next) => {
@@ -103,6 +105,14 @@ router.post('/add.do', ...rules, async (req, res, next) => {
     })
   }
   try {
+    // let isExists = await dao.checkExist('title', req.body.title);
+    // if (isExists) {
+    //   return res.json({
+    //     status: 'error',
+    //     message: '商品名称已经存在！'
+    //   })
+    // }
+
     const { result, insertId } = await dao.insert(req.body);
     console.log('add req.body: ', req.body);
     res.json({
@@ -117,31 +127,6 @@ router.post('/add.do', ...rules, async (req, res, next) => {
   }
 })
 
-router.post('/addSlidePic.do', ...rules, async function (req, res, next) { 
-  const errors = validationResult(req); // 验证数据是否符合规则
-  // 如果错误不为空，抛出错误
-  if (!errors.isEmpty()) {
-    return res.json({
-      errors: errors.array()
-    })
-  }
-  try {
-    console.log('addSlidePic req.body: ', req.body);
-    // const {id, goodsId, slideShowUrl } = req.body
-    // console.log(111,id, goodsId, slideShowUrl)
-    const { result, insertId } = await dao.addSlidePic(req.body);
-    // console.log(222,id, goodsId, slideShowUrl)
-    res.json({
-      status: result > 0 ? 'success' : 'error',
-      message: result > 0 ? '图片添加成功' : '图片添加失败',
-      insertId: result > 0 ? insertId : 0,
-    })
-  } catch (err) {
-    console.log(err);
-    res.locals.err = err;
-    next();
-  }
-})
 
 // 编辑
 router.post('/edit.do', ...rules, async (req, res, next) => {
@@ -153,6 +138,14 @@ router.post('/edit.do', ...rules, async (req, res, next) => {
     })
   }
   try {
+    // let isExists = await dao.checkExist('title', req.body.title);
+    // if (isExists) {
+    //   return res.json({
+    //     status: 'error',
+    //     message: '商品名称已经存在！'
+    //   })
+    // }
+
     const { result } = await dao.updateByPrimaryKey(req.body, req.body.id);
     res.json({
       status: result > 0 ? 'success' : 'error',

@@ -1,7 +1,0 @@
-{
-  "config_name": "develop",
-  "upload_config": {
-    "baseURL": "http://localhost:3000",
-    "upload_ueditor": "upload_ueditor"
-  }
-}
